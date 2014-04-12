@@ -1,0 +1,280 @@
+/*
+ *  Copyright 2014 Richard Van Tassel
+ *
+ *  This file is part of Coin-chance.
+ *
+ *  Coin-chance is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Coin-chance is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Coin-chance.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+body {
+    text-align:center;
+    padding: 0px;
+    margin: 50 0px 0px 0px;
+    background-color: #106915;
+}
+
+#content {
+    max-width: 1200px;
+    margin: 0px auto 0px auto;
+    padding:0px;
+    text-align:left;
+    background-color: #DDD;
+    border: 2px solid black;
+    -mox-box-shadow: 4px 4px 4px 4px black;
+    -webkit-box-shadow: 4px 4px 4px 4px black;
+    box-shadow: 2px 2px 4px 1px black;
+    border-radius: 8px;
+}
+
+#header {
+    height: 50px;
+    float: top;
+    background-color: #CCC;
+    border-radius: 8px 8px 0px 0px;
+    line-height: 50px;
+    vertical-align: middle;
+}
+
+#inner {
+    margin:auto;
+    padding: 0px 2px 0px 2px;
+    text-align: center;
+}
+
+.section {
+    display: inline-block;
+    margin: 0px 4px 0px 4px;
+}
+.title-section {
+    width:50%;
+    }
+
+#header .section {
+    height: 50px;
+}
+
+#title {
+    margin-top: 0px;
+    line-height: 30px;
+    white-space: nowrap;
+    overflow:hidden;
+    height:30px;
+    text-overflow:ellipsis;
+    font-weight: bold;
+    font-size: large;
+    max-width: 100%;
+    margin-right: 20px;
+    }
+
+#name:link, #title:link {text-decoration:none; color: black;}
+#name:visited, #title:visited {text-decoration:none; color: black;}
+#name:hover, #title:hover {text-decoration:underline; color: black;}
+#name:active, #title:active {text-decoration:underline; color: black;}
+
+#name {
+    line-height:18px;
+    padding-top: 0px;
+    white-space: nowrap;
+    overflow:hidden;
+    height: 18px;
+    text-overflow: ellipsis;
+    font-size: small;
+    color: black;
+}
+
+#balance {
+    font-size: x-large;
+    font-weight: bold;
+}
+
+span.main-label {
+    display:inline-block;
+    width: 50px;
+}
+
+span.input-left {
+    display:inline-block;
+    border: 2px solid #BBB;
+    background-color:#DDD;
+    border-radius: 8px 0px 0px 8px;
+    height: 20px;
+    padding: 1px;
+    min-width: 20px;
+    text-align: center;
+    cursor:pointer;
+}
+    
+input.main-input {
+    border-style:solid;
+    border-width: 2px 0px 2px 0px;
+    border-color: #BBB;
+    margin: 5px 0px 5px 0px;
+    padding: 1px;
+    height: 20px;
+    width: 172px;
+    font-family: monospace;
+    font-size: 16px;
+}
+
+span.input-right {
+    display:inline-block;
+    border: 2px solid #BBB;
+    background-color:#DDD;
+    border-radius: 0px 8px 8px 0px;
+    height: 20px;
+    padding: 1px;
+    min-width: 20px;
+    text-align: center;
+    cursor:pointer;
+}
+
+#winCount {
+    font-size: x-large;
+    color: green;
+}
+
+#winLossSeparator {
+    font-size: large;
+    margin: 0px 4px 0px 4px;
+}
+
+#lossCount {
+    font-size: large;
+    color: red;
+}
+
+div.failure {
+    background-color:pink;
+    margin: auto;
+    border: 2px solid black;
+    padding: 3px;
+}
+
+input.invalid {
+    background-color:pink;
+}
+
+#chatForm {
+    display:table;
+    width:100%;
+    max-width:800px;
+}
+
+.formPiece {
+    text-align: left;
+    display: table-cell;
+}
+
+.formPiece:first-child, input[type="text"] {
+    width: 100%;
+}
+
+#chatField {
+    box-sizing: border-box;
+}
+
+#send {
+    box-sizing: border-box;    
+}
+
+div#chat {
+    font-family: monospace;
+    text-align: left;
+    height: 300px; 
+    margin: 0px; 
+    border: solid 1px #999; 
+    overflow-y: scroll;
+    max-width:800px;
+}
+
+div#stuff{
+    height: 400px;
+}
+
+#chattab {
+    display:none;
+}
+
+#jointab{
+    width: 100%;
+    text-align: center;
+}
+
+div#stuff > span {
+    width: 40%;
+}
+
+#betList {
+    width: 302px;
+    height: 270px;
+    overflow-y: auto;
+    }
+
+#betList > div span {
+    display: inline-block;
+    min-height: 10px;
+    margin: 2px;
+    width:80px;
+    }
+
+#betStuff {
+    text-align:center;
+    width: 302px;
+    height: 250px;
+    overflow: hidden;
+}
+
+code {
+    border: grey 1px dashed;
+    background-color: DDD;
+    margin-right: 10px;
+    margin-left: 2px;
+    padding: 1px;
+}
+
+.right {
+    float: right;
+}
+
+.good-luck {
+    color: gold;
+}
+
+.good-choice {
+    color: green;
+}
+
+.bad-luck {
+    color: brown;
+}
+
+.bad-choice {
+    color: red;
+}
+
+.win-profit {
+    color: green;
+}
+
+.lose-profit {
+    color: red;
+}
+
+.playerProfit {
+    font-weight: bold;
+}
+
+#depositQR {
+    cursor:pointer;
+}

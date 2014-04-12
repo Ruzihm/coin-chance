@@ -1,0 +1,34 @@
+{
+  "name": "coin-chance",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.8",
+    "express-minify": "*",
+    "jade": "*",
+    "mongoose": "*",
+    "mongoose-auto-increment": "*",
+    "bcrypt": "*",
+    "socket.io": "*",
+    "node-json-rpc": "*",
+    "cookie": "*",
+    "connect": "*",
+    "biguint-format": "*",
+    "random-name": "*",
+    "speakeasy": "*",
+    "bignumber.js": "^1.3.0",
+    "cryptoaddress-validator": "0.0.1",
+    "tar": "^0.1.19",
+    "fstream": "^0.1.25",
+    "tmp": "0.0.23"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-express": "*",
+    "grunt-contrib-jshint": "*",
+    "express-debug": "^1.0.3"
+  }
+}

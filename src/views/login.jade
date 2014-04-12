@@ -1,0 +1,57 @@
+//-
+    Copyright 2014 Richard Van Tassel
+
+    This file is part of Coin-chance.
+
+    Coin-chance is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Coin-chance is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with Coin-chance.  If not, see <http://www.gnu.org/licenses/>.
+
+doctype html
+html(lang="en")
+    head
+        title= title + " - " + description
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        link(href="css/coin-chance-login.css" rel="stylesheet")
+        link(href="css/smoothness/jquery-ui-1.10.4.custom.min.css" rel="stylesheet")
+        script(src="/js/jquery-1.10.2.min.js")
+        script(src="/js/jquery-ui-1.10.4.custom.min.js")
+        script(async='async' src='/js/coin-chance-login.js')
+    body
+        #content
+            #header
+                .section.title-section
+                    #title-name 
+                        a#title(href="/") #{title}
+            #inner 
+                h1 Login:
+                if loginFailure
+                    .failure Login failed
+                form#loginForm(method="POST",action="/login")
+                    span username
+                    input#username(name="username")
+                    br
+                    span password
+                    input#password(type="password",name="password")
+                    br
+                    span OTP code (if needed)
+                    input#otp(name="otp")
+                    br
+                    input#submit(type="submit")
+                h2 Or:
+                    input#newAccount(type="button",value="New Account")
+                #agplStuff
+                    if srcLink==""
+                        - srcLink = "/dist/dist.tar.gz"
+                    a#agplLink(href="#{srcLink}")
+                        img#agplLogo(src="/images/agplv3-155x51.png")
+

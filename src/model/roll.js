@@ -1,0 +1,49 @@
+/*
+ *  Copyright 2014 Richard Van Tassel
+ *
+ *  This file is part of Coin-chance.
+ *
+ *  Coin-chance is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Coin-chance is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Coin-chance.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// Connect to db
+var db = require('./db'),
+    mongoose = require('mongoose'),
+    autoIncrement = require('mongoose-auto-increment');
+
+
+var rollSchema = mongoose.Schema({
+        date: Date,
+        userId: Number,
+        multiplier: String,
+        stake: String,
+        profit: String,
+        chance: String,
+        target: Number,
+        isHighGuess: Boolean,
+        lucky: Number,
+        didWin: Boolean,
+        serverSeedHash: String,
+        serverSeed: String,
+        serverSeedRevealed: Boolean,
+        clientSeed: String,
+        nonce: Number});
+
+rollSchema.plugin(autoIncrement.plugin, 'Roll');
+exports.RollModel = mongoose.model('Roll', rollSchema);
+
+exports.getRollById = function getRollByRollId(rollId, cb) {
+    var Roll = mongoose.model('Roll');
+    Roll.findById(rollId, cb);
+};

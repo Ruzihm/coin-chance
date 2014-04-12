@@ -1,0 +1,243 @@
+//- 
+    Copyright 2014 Richard Van Tassel
+
+    This file is part of Coin-chance.
+
+    Coin-chance is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Coin-chance is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with Coin-chance.  If not, see <http://www.gnu.org/licenses/>.
+
+doctype html
+html(lang="en")
+    head
+        title= title + " - " + description
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        link(rel="stylesheet",href="/css/coin-chance.css")
+        link(rel="stylesheet",href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+        link(rel="stylesheet",href="/css/lavish-bootstrap.min.css")
+        link(rel="stylesheet",href="css/smoothness/jquery-ui-1.10.4.custom.min.css")
+        script(src="/js/head.min.js")
+        script(type="text/javascript").
+            head.load(["/socket.io/socket.io.v0.9.9.js","/js/jquery-1.10.2.min.js","//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"], function () {
+                head.load(["/js/jquery-ui-1.10.4.custom.min.js","/js/coin-chance.js","/js/jquery.qrcode.min.js"]);
+            });
+    body
+        #content
+            #header
+                .section.title-section
+                    #title-name 
+                        a#title(href="/") #{title}
+                        a#name(href="/#{loginLink}") #{fullName}
+                .section.right
+                    .section
+                        span.winCount#winCount #{winCount}
+                        span#winLossSeparator /
+                        span.lossCount#lossCount #{lossCount}
+            #inner 
+                #betList.section
+                #betStuff.section
+                    #section
+                        span#balance #{balance}
+                        input#depositWithdrawButton(type="button",value="Deposit/withdraw")
+
+                    #chanceZone
+                        span.main-label %
+                        span#decreaseChance.input-left -
+                        input#betChance.main-input(pattern="[.0-9]*",value="",maxlength="7")
+                        span#increaseChance.input-right +
+                    #multiplierZone
+                        span.main-label X
+                        span#halveMult.input-left /2
+                        input#betMult.main-input(pattern="[.0-9]*",value="", maxlength="15")
+                        span#doubleMult.input-right x2
+                    #betSizeZone
+                        span.main-label size
+                        span#halveSize.input-left /2
+                        input#betSize.main-input(pattern="[.0-9]*",value="0", maxlength="17")
+                        span#doubleSize.input-right x2
+                    #profitZone
+                        span.main-label profit
+                        span#decreaseProfit.input-left -
+                        input#betProfit.main-input(pattern="[.0-9]*",value="0", maxlength="17")
+                        span#increaseProfit.input-right +
+                    #lobet
+                        span ( &lt;
+                        span#loamount
+                        span )
+                        input#betLoButton(type="button",value="Bet Lo")
+                    #hibet
+                        span ( &gt;
+                        span#hiamount 
+                        span )
+                        input#betHiButton(type="button",value="Bet Hi")
+                    #invalidBetReason
+                div
+                    div#jointab
+                        input#joinChatButton(type="button", value="Enter chat")
+                    div#chattab
+                        div#chat
+                        div.controls
+                            form#chatForm(autocomplete="off")
+                                .formPiece
+                                    input#chatField(type='text',maxlength="1024",autocomplete="off")
+                                .formPiece
+                                    input#send(type='submit', value='send') 
+                .stats.section
+                    fieldset#personalInfo
+                        legend Personal Stats
+                        .section
+                            span Wins
+                            code.winCount#winCount #{winCount}
+                        .section
+                            span Losses
+                            code.lossCount#lossCount #{lossCount}
+                        .section
+                            span Betting profit
+                            code#wageredProfit #{wageredProfit}
+                        .section
+                            span Luck
+                            code#luck #{luck}
+                        .section
+                            span Invested 
+                            code#invested #{invested}
+                        .section
+                            span Invested profit
+                            code#investedProfit #{investedProfit}
+                .stats.section
+                    fieldset#housestats
+                        legend House Stats
+                        .section
+                            span Wins
+                            code.winCount#houseWinCount #{houseWinCount}
+                        .section
+                            span Losses
+                            code.lossCount#houseLossCount #{houseLossCount}
+                        .section
+                            span Betting profit
+                            code#houseWageredProfit #{houseWageredProfit}
+                        .section
+                            span Luck
+                            code#houseLuck #{houseLuck}
+                        .section
+                            span Invested
+                            code#housebankroll #{houseBankRoll}
+                        .section
+                            span Invested profit
+                            code#houseInvestedProfit #{houseInvestedProfit}
+                fieldset.section
+                    legend Max Profit
+                    code#maxProfit #{maxProfit}
+
+                if isNewUser
+                    #newUserDialog(style="display:none;")
+                        h1 Welcome to #{title}
+                        h3 You will be known as #{myName} unless you specify otherwise:
+                        form#newNameForm
+                            input#newName(type="text",maxlength="32",pattern="\\w{1,32}")
+                            input#newNameSubmit(type="submit",value="Use this name")
+    
+                #depositWithdrawDialog(style="display:none;")
+
+                    span Deposit Address
+                    #depositQR
+                    #depositAddress(style="display:none;") #{depositAddress}
+
+                    form#withdrawForm
+                        fieldset
+                            legend Withdraw
+                            span.withdraw-label Withdraw address
+                            input#withdrawAddress
+                            br
+                            span.withdraw-label Amount 
+                            input#withdrawAmount(type="text", pattern="[.0-9]+")
+                            input#withdrawButton(type="submit", value="withdraw")
+
+                #randomizeDialog(style="display:none")
+                    p
+                        span Previous server seed: 
+                        code#prevSSeed
+                    p
+                        span Previous server hash:
+                        code#prevSHash
+                    p
+                        span Previous client seed:
+                        code#prevCSeed
+                    p
+                        span Nonce:
+                        code#prevBetCount
+                    p You can put this in a validator, and you should see the lucky numbers you've gotten since your last randomization:
+                    #randomizeVals(style='width: 500px; height: 100px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: auto;')
+                    p
+                        span The new server seed's hash:
+                        code#curSHash
+                    p
+                        span Input a client seed here (up to 24 numeric characters)
+                        input#customCSeed(pattern="[0-9]*")
+                        input#sendCustomSeed(type="button", value="Use this client seed")
+
+                form#accountSetupForm.section
+                    fieldset
+                        legend Traditional account setup
+                        if ! username
+                            div#usernameSetupZone
+                                span Username: 
+                                input#setUsername(maxlength="64")
+                                br
+                        span Password
+                        input#setPassword(type="password")
+                        br
+                        span Confirm 
+                        input#setPasswordConfirm(type="password")
+                        br
+                        input(type="submit",value="Save")
+                form#changeNameForm.section
+                    fieldset
+                        legend Change display name
+                        input#setDisplayName(pattern="^\\s*\\w{3,32}\\s*$",maxlength="32",value=myName)
+                        input(type="submit",value="Save")
+                form#loginForm(action="/login",method="POST").section
+                    fieldset
+                        legend Login
+                        span Username
+                        input#loginUsername(name="username")
+                        br
+                        span Password
+                        input#loginPassword(type="password",name="password")
+                        br
+                        input(type="submit",value="Login")
+                #randomize
+                    input#randomizeButton(type="button",value="Randomize")
+                #investmentStuff
+                    input#invest
+                    input#investButton(type="button", value="Invest")
+                #historyDialog(style="display:none;")
+                    #history
+                #divestmentStuff
+                    input#divest
+                    input#divestButton(type="button", value="Divest")
+                #historyStuff
+                    input#historyButton(type="button", value="Account history")
+                input#logoutButton(type="button", value="Logout")
+                
+                if srcLink==""
+                    - srcLink = "/dist/dist.tar.gz"
+                #agplStuff
+                    a#agplLink(href="#{srcLink}")
+                        img#agplLogo(src="/images/agplv3-155x51.png")
+                input#houseEdge(value="#{houseEdge}", type="hidden")
+                input#houseCut(value="#{houseCut}", type="hidden")
+                input#ioconnectstring(value="#{ioconnectstring}", type="hidden")
+                input#withdrawFee(value="#{withdrawFee}",type="hidden")
+                input#isNewUser(value="#{isNewUser}",type="hidden")
+                input#REQUIRED_CONFIRMATIONS(value="#{REQUIRED_CONFIRMATIONS}",type="hidden")
+                input#minBet(value="#{minBet}",type="hidden")
+            b

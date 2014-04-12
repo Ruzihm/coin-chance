@@ -1,0 +1,314 @@
+//- 
+    Copyright 2014 Richard Van Tassel
+
+    This file is part of Coin-chance.
+
+    Coin-chance is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Coin-chance is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with Coin-chance.  If not, see <http://www.gnu.org/licenses/>.
+
+doctype html
+html(lang="en")
+    head
+        title= title + " - " + description
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        link(rel="stylesheet",href="/css/coin-chance.css")
+        link(rel="stylesheet",href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+        link(rel="stylesheet",href="/css/lavish-bootstrap.min.css")
+        link(rel="stylesheet",href="css/smoothness/jquery-ui-1.10.4.custom.min.css")
+        script(src="/js/head.min.js")
+        script(type="text/javascript").
+            head.load(["/socket.io/socket.io.v0.9.9.js","/js/jquery-1.10.2.min.js","//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js","/js/big.min.js"], function () {
+                head.load(["/js/jquery-ui-1.10.4.custom.min.js","/js/coin-chance.js","/js/jquery.qrcode.min.js"]);
+            });
+    body
+        nav.navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+            .container
+                .navbar-header
+                    button.navbar-toggle(type="button",data-toggle="collapse" data-target="#header")
+                        span.sr-only Toggle navigation
+                        span.icon-bar
+                        span.icon-bar
+                        span.icon-bar
+                    a.navbar-brand(href="#") #{title}
+                #header.collapse.navbar-collapse
+                    ul.nav.navbar-nav.navbar-right
+                        li
+                            a(href="/#{loginLink}") #{fullName}
+                        li.dropdown
+                            a.dropdown-toggle(data-toggle="dropdown" href="#")
+                                span Login
+                                span.caret
+                            .dropdown-menu
+                                form#loginForm(action="/login",method="POST",role="form")
+                                    .formgroup
+                                        label(for="loginUsername") Username
+                                        input#loginUsername.form-control(name="username")
+                                    .formgroup
+                                        label(for="loginPassword") Password
+                                        input#loginPassword.form-control(type="password",name="password")
+                                    button.btn.btn-default(type="submit") Login
+                        li.dropdown
+                               
+        .container
+            #betStuff.row
+                .row
+                    span
+                        strong #{currencySymbol}
+                        strong#balance #{balance}
+                    button#depositWithdrawButton.btn.btn-default(type="button") 
+                        span.glyphicon.glyphicon-transfer
+
+                #chanceZone.form-group
+                    label(for="betChance") Win odds
+                    .input-group
+                        .input-group-btn
+                            button#decreaseChance.btn.btn-default(type="button")
+                                span.glyphicon.glyphicon-minus
+                        input#betChance.form-control(type="text",pattern="[.0-9]*",value="",maxlength="7")
+                        .input-group-btn
+                            button#increaseChance.btn.btn-default(type="button")
+                                span.glyphicon.glyphicon-plus
+                #multiplierZone.form-group
+                    label(for="betMult") Multiplier
+                    .input-group
+                        .input-group-btn
+                            button#halveMult.btn.btn-default(type="button") &div;2
+                        input#betMult.form-control(type="text",pattern="[.0-9]*",value="", maxlength="15")
+                        .input-group-btn
+                            button#doubleMult.btn.btn-default(type="button") &times;2
+                #betSizeZone.form-group
+                    label(for="betSize") Wager size
+                    .input-group
+                        .input-group-btn
+                            button#halveSize.btn.btn-default(type="button") &div;2
+                        input#betSize.form-control(type="text",pattern="[.0-9]*",value="0", maxlength="17")
+                        .input-group-btn
+                            button#doubleSize.btn.btn-default(type="button") &times;2
+                #profitZone.form-group
+                    label(for="betProfit") Win profit
+                    .input-group
+                        .input-group-btn
+                            button#decreaseProfit.btn.btn-default(type="button")
+                                span.glyphicon.glyphicon-minus
+                        input#betProfit.form-control(type="text",pattern="[.0-9]*",value="0", maxlength="17")
+                        .input-group-btn
+                            button#increaseProfit.btn.btn-default(type="button")
+                                span.glyphicon.glyphicon-plus
+                button#betLoButton.btn.btn-primary(type="button")
+                    h4 Bet Lo
+                    span &lt;
+                    span#loamount
+
+                button#betHiButton.btn.btn-primary(type="button")
+                    h4 Bet Hi
+                    span &gt;
+                    span#hiamount
+                #invalidBetReason 
+
+            .row 
+                ul.nav.nav-tabs#tabs
+                    li.active
+                        a(href="#betList",data-toggle="tab") 
+                            span.glyphicon.glyphicon-list
+                            span.hidden-xs Bets
+                    li
+                        a#chattab(href="#chatTabPane",data-toggle="tab") 
+                            span.glyphicon.glyphicon-comment
+                            span.hidden-xs Chat
+                    li
+                        a(href="#statsTab",data-toggle="tab")
+                            span.glyphicon.glyphicon-stats
+                            span.hidden-xs Stats
+                    li
+                        a(href="#optionsTabPane",data-toggle="tab") 
+                            span.glyphicon.glyphicon-user
+                            span.hidden-xs Options
+                    li
+                        a(href="#investmentTabPane",data-toggle="tab") 
+                            span.glypicon.glyphicon-briefcase
+                            span.hidden-xs Invest
+                .tab-content
+                    #betList.tab-pane.active
+                    #chatTabPane.tab-pane
+                        form#chatForm(autocomplete="off").form-group.center-block
+                            div#chat
+                            .input-group
+                                input#chatField.form-control(type='text',maxlength="1024",autocomplete="off")
+                                .input-group-btn
+                                    button#send.btn.btn-default(type='submit') Send
+                    #statsTab.tab-pane
+                        .stats.center-block
+                            fieldset#personalInfo
+                                legend Personal Stats
+                                .center-block
+                                    span Wins
+                                    code.winCount#winCount #{winCount}
+                                .center-block
+                                    span Losses
+                                    code.lossCount#lossCount #{lossCount}
+                                .center-block
+                                    span Betting profit
+                                    code#wageredProfit #{wageredProfit}
+                                .center-block
+                                    span Luck
+                                    code#luck #{luck}
+                                .center-block
+                                    span Invested 
+                                    code#invested #{invested}
+                                .center-block
+                                    span Invested profit
+                                    code#investedProfit #{investedProfit}
+                        .stats.center-block
+                            fieldset#housestats
+                                legend House Stats
+                                .center-block
+                                    span Wins
+                                    code.winCount#houseWinCount #{houseWinCount}
+                                .center-block
+                                    span Losses
+                                    code.lossCount#houseLossCount #{houseLossCount}
+                                .center-block
+                                    span Betting profit
+                                    code#houseWageredProfit #{houseWageredProfit}
+                                .center-block
+                                    span Luck
+                                    code#houseLuck #{houseLuck}
+                                .center-block
+                                    span Invested
+                                    code#housebankroll #{houseBankRoll}
+                                .center-block
+                                    span Invested profit
+                                    code#houseInvestedProfit #{houseInvestedProfit}
+                        fieldset.center-block
+                            legend Max Profit
+                            code#maxProfit #{maxProfit}
+                    #optionsTabPane.tab-pane
+                        form#changeNameForm
+                            .form-group
+                                label(for="setDisplayName") Display Name
+                                input#setDisplayName.form-control(pattern="^\\s*\\w{3,32}\\s*$",maxlength="32",value=myName)
+                            button.btn.btn-default(type="submit") Save
+
+
+                        form#accountSetupForm(role="form")
+                            if ! username
+                                #usernameSetupZone.formgroup
+                                    label(for="setUsername") Username
+                                    input#setUsername.form-control(type="text",maxlength="64")
+                            .formgroup
+                                label(for="setPassword") Password
+                                input#setPassword.form-control(type="password")
+                            .formgroup
+                                label(for="setPasswordConfirm") Confirm 
+                                input#setPasswordConfirm.form-control(type="password")
+                            button.btn.btn-default(type="submit") Save
+                        
+                        button#randomizeButton.btn.btn-default Randomize
+                        button#historyButton.btn.btn-default Account History
+                        button#logoutButton.btn.btn-default Logout
+
+                    #investmentTabPane.tab-pane
+                        form(role="form")
+                            .input-group
+                                input#invest.form-control
+                                .input-group-btn
+                                    button#investButton.btn.btn-default(type="button") Invest
+                            .input-group
+                                input#divest.form-control
+                                .input-group-btn
+                                    button#divestButton.btn.btn-default(type="button") Divest
+
+
+
+            if isNewUser
+                #newUserDialog(style="display:none;")
+                    h1 Welcome to #{title}
+                    h3 You will be known as #{myName} unless you specify otherwise:
+                    form#newNameForm
+                        input#newName(type="text",maxlength="32",pattern="\\w{1,32}")
+                        input#newNameSubmit(type="submit",value="Use this name")
+
+            if srcLink==""
+                - srcLink = "/dist/dist.tar.gz"
+            #agplStuff
+                a#agplLink(href="#{srcLink}")
+                    img#agplLogo(src="/images/agplv3-155x51.png")
+
+            input#houseEdge(value="#{houseEdge}", type="hidden")
+            input#houseCut(value="#{houseCut}", type="hidden")
+            input#ioconnectstring(value="#{ioconnectstring}", type="hidden")
+            input#withdrawFee(value="#{withdrawFee}",type="hidden")
+            input#isNewUser(value="#{isNewUser}",type="hidden")
+            input#REQUIRED_CONFIRMATIONS(value="#{REQUIRED_CONFIRMATIONS}",type="hidden")
+            input#minBet(value="#{minBet}",type="hidden")
+            input#decimalPlaces(value="#{decimalPlaces}",type="hidden")
+            input#investmentDecimalPlaces(value="#{investmentDecimalPlaces}",type="hidden")
+
+        #depositWithdrawDialog.modal.fase(tabindex="-1",role="dialog")
+            .modal-dialog(style="left:0;right:0;")
+                .modal-content
+                    .modal-header
+                        button.close(type="button",data-dismiss="modal",aria-hidden="true") &times;
+                        h4.modal-title Deposit/Withdraw
+                    .modal-body
+                        span Deposit Address
+                        #depositQR
+                        #depositAddress(style="display:none;") #{depositAddress}
+
+                        form#withdrawForm(role="form")
+                            .form-group
+                                label.control-label(for="withdrawAddress") Withdraw address
+                                input#withdrawAddress.form-control(type="text")
+                            .form-group
+                                label.control-label(for="withdrawAmount") Amount 
+                                input#withdrawAmount.form-control(type="text", pattern="[.0-9]+")
+                            .form-group
+                                button#withdrawButton.btn.btn-default(type="submit") Withdraw
+
+        #historyDialog.modal.fade(tabindex="-1",role="dialog")
+            .modal-dialog(style="left:0;right:0;")
+                .modal-content
+                    .modal-header
+                        button.close(type="button",data-dismiss="modal",aria-hidden="true") &times;
+                        h4.modal-title History
+                    #history.modal-body
+          
+        #randomizeDialog.modal.fade(tabindex="-1",role="dialog")
+            .modal-dialog(style="left:0;right:0;")
+                .modal-content
+                    .modal-header
+                        button.close(type="button",data-dismiss="modal",aria-hidden="true") &times;
+                        h4.modal-title Randomize
+                    .modal-body
+                        p
+                            span Previous server seed: 
+                            code#prevSSeed
+                        p
+                            span Previous server hash:
+                            code#prevSHash
+                        p
+                            span Previous client seed:
+                            code#prevCSeed
+                        p
+                            span Nonce:
+                            code#prevBetCount
+                        p You can put this in a validator, and you should see the lucky numbers you've gotten since your last randomization:
+                        #randomizeVals(style='width: 500px; height: 100px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: auto;')
+                        p
+                            span The new server seed's hash:
+                            code#curSHash
+                        p
+                            span Input a client seed here (up to 24 numeric characters)
+                            input#customCSeed.form-control(pattern="[0-9]*",type="text")
+                    .modal-footer
+                        button#sendCustomSeed.btn.btn-default(type="button") Use this client seed

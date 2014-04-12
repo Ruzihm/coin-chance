@@ -1,0 +1,48 @@
+##CryptoCurrency address validator.
+
+####Description
+
+After researching a lot online about validating crypto-currencies addresses without making API calls in daemons running in background, i found usefull scripts that did this action in client-side and attempted to port them to NodeJS javascript.
+
+####Sources
+
+*Didn't find any licences that would exclude publishing of the code, if the anyone feels that this package violates a licence, please feel free to contact me.*
+
+ - The original source was from this thread <a href="https://bitcointalk.org/index.php?topic=9838.0">at bitcoindtalk.</a>
+ 
+- the second source which the same code appears was found here. <a href="
+http://stackoverflow.com/questions/21559851/bitcoin-address-form-validation-javascript-and-php">at stackoverflow.com</a>
+
+- my question which motivated me is <a href="
+http://stackoverflow.com/questions/22014600/dogecoin-address-validation-on-nodejs">here</a>.
+
+####Dependencies
+
+None , `BigInt.js` is the only depedency which is already inside the package, and its the minified version its used which makes only 17KB instead of 49KB.
+
+####Installation
+
+`npm install cryptoaddress-validator`
+
+####Usage
+
+```javascript
+/*
+* Requiring the module, returns only one function which takes the address
+* as a parameter, the result when calling the function is a boolean meaning 
+* true for valid addresses and false for invalid.
+*/
+var CryptoAddressCheck=require("cryptoaddress-validator");
+if(CryptoAddressCheck("DBKh7QAP9gkXncVK32jtfae4QXChPwsyKH")){ // validating a dogecoin address
+	console.log("Valid address");
+}else{
+	console.log("Invalid address");
+}
+
+// logs "Valid address"
+```
+
+####Licence 
+
+###MIT
+Big Integer Library v. 5.5 is written by <a href="www.leemon.com">Leemon Baird</a>
