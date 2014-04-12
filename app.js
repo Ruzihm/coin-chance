@@ -56,29 +56,24 @@ if (config.SRC_LINK === "") {
     }
     
     // compress everything in current dir and put it in a temp file
-    if (false) {
-        var tmpFile = tmp.file(function (err, tmpPath, fd) {
-            console.info("Zipping up soure. Putting it in " + tmpPath);
-            fstream.Reader({ 'path': '.', 'type': 'Directory' })
-                .pipe(tar.Pack())
-                .pipe(zlib.Gzip())
-                //.pipe(fstream.Writer({ 'path': tmpPath }))
-                .pipe(fs.createWriteStream(tmpPath))
-                .on('finish', function() {
-                    // Move the zip to src/public/dist/dist.tar.gz
-                    console.info("Source zipped. Moving to src/public/dist/dist.tar.gz");
-                    fstream.Reader({ 'path': tmpPath})
-                        //.pipe(fstream.Writer({ 'path': 'src/public/dist/dist.tar.gz' }))
-                        .pipe(fs.createWriteStream('src/public/dist/dist.tar.gz'))
-                        .on('finish', function () {
-                            startApp();
-                    });
+    var tmpFile = tmp.file(function (err, tmpPath, fd) {
+        console.info("Zipping up soure. Putting it in " + tmpPath);
+        fstream.Reader({ 'path': '.', 'type': 'Directory' })
+            .pipe(tar.Pack())
+            .pipe(zlib.Gzip())
+            //.pipe(fstream.Writer({ 'path': tmpPath }))
+            .pipe(fs.createWriteStream(tmpPath))
+            .on('finish', function() {
+                // Move the zip to src/public/dist/dist.tar.gz
+                console.info("Source zipped. Moving to src/public/dist/dist.tar.gz");
+                fstream.Reader({ 'path': tmpPath})
+                    //.pipe(fstream.Writer({ 'path': 'src/public/dist/dist.tar.gz' }))
+                    .pipe(fs.createWriteStream('src/public/dist/dist.tar.gz'))
+                    .on('finish', function () {
+                        startApp();
                 });
+            });
         });
-    } else { 
-        // App disabled:
-        startApp();
-    }
 } else {
     startApp();
 }
