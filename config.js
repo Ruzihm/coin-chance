@@ -26,7 +26,7 @@ exports.DECIMAL_PLACES = 8;
 
 exports.INVESTMENT_DECIMAL_PLACES = 16;
 
-exports.SRC_LINK = "";
+exports.SRC_LINK = "https://github.com/Ruzihm/coin-chance";
 
 // Mongodb connection string
 exports.MONGO_CONN_STR = process.env.COIN_CHANCE_CONNSTR; // "mongodb://localhost/test"
