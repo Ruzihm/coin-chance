@@ -63,11 +63,11 @@ var userSchema = mongoose.Schema({
     wins: Number,                    // Total win count
     losses: Number,                  // Total loss count
     luck: String,                    // Win count / expected win count
-    wagered: String,                 // Total amount wagered (satoshis)
-    wageredProfit: String,           // Total amount profit from wagers (satoshis)
-    invested: String,                // Current amount invested  (satoshis)
-    investedProfit: String,          // Total amount profit from investing (satoshis)
-    softNetBalance: String,             // User's balance that isn't in user's account (satoshis)
+    wagered: String,                 // Total amount wagered
+    wageredProfit: String,           // Total amount profit from wagers 
+    invested: String,                // Current amount invested 
+    investedProfit: String,          // Total amount profit from investing 
+    softNetBalance: String,             // User's balance that isn't in user's account 
     serverSeed: String,              // User's current server seed
     clientSeed: String,              // User's current client seed
     clientSeedLocked: Boolean,       // If User can still change the client seed
