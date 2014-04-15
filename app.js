@@ -94,7 +94,10 @@ function startApp() {
     app.use(express.favicon());
     app.use(express.methodOverride());
     app.use(express.cookieParser(config.COOKIE_SECRET));
-    var sessionStore = new express.session.MemoryStore();
+    var sessionStore;
+    if (config.SESSION_STORE === 'MEMORY') {
+        sessionStore = new express.session.MemoryStore();
+    }
     app.use(express.session({store: sessionStore, cookie: {secure:true}}));
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'src/public')));
