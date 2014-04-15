@@ -17,7 +17,8 @@
  *  along with Coin-chance.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var BigNumber = require("bignumber.js");
+var BigNumber = require("bignumber.js"),
+    express = require("express");
 
 // How small the coin can be divided (Bitcoin has 8, for instance)
 exports.DECIMAL_PLACES = 8;
@@ -29,6 +30,10 @@ exports.INVESTMENT_DECIMAL_PLACES = 16;
 exports.SRC_LINK = "https://github.com/Ruzihm/coin-chance";
 
 // Mongodb connection string
+
+exports.SESSION_STORE_TYPE = "MEMORY";
+exports.SESSION_STORE_OPTIONS = {};
+
 exports.MONGO_CONN_STR = process.env.COIN_CHANCE_CONNSTR; // "mongodb://localhost/test"
 
 // Name of site
