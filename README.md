@@ -14,7 +14,7 @@ Requirements
 Installation instructions
 ===========
 
-1. Unpack source to any directory.
+1. Unpack source to any empty directory.
 2. Modify config.js (Details coming soon)
 3. Setup service user: `$ useradd -m -s /bin/bash coinchance`
 4. Configure secret values in /home/coinchance/.bashrc : 
