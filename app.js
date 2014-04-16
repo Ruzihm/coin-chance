@@ -95,7 +95,7 @@ function startApp() {
     app.use(express.methodOverride());
     app.use(express.cookieParser(config.COOKIE_SECRET));
     var sessionStore;
-    if (config.SESSION_STORE === 'MEMORY') {
+    if (config.SESSION_STORE_TYPE === 'MEMORY') {
         sessionStore = new express.session.MemoryStore();
     }
     app.use(express.session({store: sessionStore, cookie: {secure:true}}));
