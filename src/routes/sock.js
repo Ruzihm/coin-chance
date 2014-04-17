@@ -214,7 +214,6 @@ exports.onconnect = function(socket) {
         }
     });
 
-    //data.divestAmount is in satoshis
     socket.on('divest', function (data) {
         //sanity check on input
         if (undefined === data || isNaN(data.divestAmount)) {
@@ -252,7 +251,6 @@ exports.onconnect = function(socket) {
     });
 
 
-    //data.investAmount is in satoshis
     socket.on('invest', function (data) {
         if (undefined === data) {
             return;
@@ -394,8 +392,7 @@ exports.onconnect = function(socket) {
         });
     });
 
-    //data.chance is player odds of winning
-    //data.betSize is in satoshis
+    //data.chance is player odds of winning in percentage, [0.0001,99.99-100*house edge]
     socket.on('bet', function (data) {
         if (undefined === data) {
             return;
