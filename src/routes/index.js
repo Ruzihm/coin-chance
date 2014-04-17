@@ -90,6 +90,8 @@ function displayPage(req, res, user, isNew) {
                 minBet: config.MINIMUM_BET,
                 decimalPlaces: config.DECIMAL_PLACES,
                 investmentDecimalPlaces: config.INVESTMENT_DECIMAL_PLACES,
+                investedPortion: BigNumber(user.invested).times(100).div(
+                        bankRoll).toFixed(6)+"%",
                 currencySymbol: config.CURRENCY_SYMBOL
             });
         });

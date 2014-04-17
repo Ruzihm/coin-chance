@@ -218,6 +218,16 @@ html(lang="en")
                         button#logoutButton.btn.btn-default Logout
 
                     #investmentTabPane.tab-pane
+                        .center-block
+                            span Current investment: 
+                            code#invested #{invested}
+                        .center-block
+                            span Your profit from investments: 
+                            code#investedProfit #{investedProfit}
+                        .center-block
+                            span Your portion of investments: 
+                            code#investedortion #{investedPortion}
+
                         form(role="form")
                             .input-group
                                 input#invest.form-control

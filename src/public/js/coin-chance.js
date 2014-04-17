@@ -164,6 +164,7 @@ socket.on('investingOccurred', function(data) {
     $("#balance").text(parseFloat(data.currentBalance));
     $("#invest").val("");
     houseBankRoll.text(data.newBankRoll);
+    $("investedPortion").text((parseFloat(data.currentInvested)*100/parseFloat(data.newBankRoll)).toFixed(6)+"%")
     maxProfit.text(data.maxProfit);
 });
 
@@ -172,6 +173,7 @@ socket.on('divestingOccurred', function(data) {
     $("#balance").text(parseFloat(data.currentBalance));
     $("#divest").val("");
     houseBankRoll.text(data.newBankRoll);
+    $("investedPortion").text((parseFloat(data.currentInvested)*100/parseFloat(data.newBankRoll)).toFixed(6)+"%")
     maxProfit.text(data.maxProfit);
 });
 
@@ -180,6 +182,8 @@ var UpdateAnyBet = function (data) {
     investedProfit.text(data.newInvestedProfit);
 
     houseBankRoll.text(data.newBankRoll);
+
+    $("investedPortion").text((parseFloat(data.newInvested)*100/parseFloat(data.newBankRoll)).toFixed(6)+"%")
     $("#balance").text(data.newBalance);
     houseInvestedProfit.text(data.newHouseInvestedProfit);
     houseLuck.text(data.newHouseLuck + "%");
