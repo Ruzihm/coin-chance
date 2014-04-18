@@ -2,6 +2,26 @@
   "name": "coin-chance",
   "version": "0.0.2",
   "private": true,
+  "description": "A play-and-invest internet casino that supports any bitcoind-like JSON-RPC api.",
+  "keywords": [
+    "bitcoin",
+    "cryptocurrency",
+    "casino",
+    "altcoin",
+    "gambling",
+    "website",
+    "invest",
+    "play-and-invest"
+  ],
+  "homepage": "https://github.com/Ruzihm/coin-chance",
+  "bugs": "https://github.com/Ruzihm/coin-chance/issues",
+  "license": {
+    "license": "AGPL-3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ruzihm/coin-chance.git"
+  },
   "scripts": {
     "start": "node app.js"
   },
