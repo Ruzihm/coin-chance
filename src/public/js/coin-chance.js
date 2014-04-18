@@ -602,7 +602,7 @@ function chanceUpdated() {
     $('#loamount').text(Big(chance).toFixed(4));
     
     //set Mult accordingly
-    var mult = Big(1).minus(houseEdge).div(chance).round(8,0);
+    var mult = Big(100).minus(houseEdge).div(chance).round(8,0);
     $(betMult).val(mult.toFixed(8).replace(/\.?0+$/,""));
 
     //set profit

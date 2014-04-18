@@ -184,7 +184,8 @@ module.exports = {
 
       klass.defineObj(anotherOtherObj);
 
-      expect(klass.$arguments).to.eql([anotherObj]);
+      expect(klass.$arguments[0]).to.be(anotherObj);
+      expect(klass.$arguments.length).to.be(1);
       expect(klass.anotherObject).to.be(anotherObj);
       expect(klass.$class.obj).to.be(anotherObj);
       expect(klass.fromBase).to.be(anotherOtherObj);

@@ -2,3 +2,4 @@
 --ui exports
 --check-leaks
 --debug-brk
+test/class-test.js

@@ -2,49 +2,38 @@
 var mongoose = require('mongoose'),
     extend = require('extend'),
     counterSchema,
-    Counter;
+    IdentityCounter;
 
 // Initialize plugin by creating counter collection in database.
 exports.initialize = function (connection) {
-
     try {
-        Counter = connection.model('mongoose-auto-increment');
+        IdentityCounter = connection.model('IdentityCounter');
     } catch (ex) {
         if (ex.name === 'MissingSchemaError') {
             // Create new counter schema.
             counterSchema = new mongoose.Schema({
-                model: {
-                    type: String,
-                    require: true
-                },
-                field: {
-                    type: String,
-                    require: true
-                },
-                count: {
-                    type: Number,
-                    default: 0
-                }
+                model: { type: String, require: true },
+                field: { type: String, require: true },
+                count: { type: Number, default: 0 }
             });
 
             // Create a unique index using the "field" and "model" fields.
             counterSchema.index({ field: 1, model: 1 }, { unique: true, required: true, index: -1 });
 
             // Create model using new schema.
-            Counter = connection.model('Mongoose-Auto-Increment', counterSchema);
+            IdentityCounter = connection.model('IdentityCounter', counterSchema);
         }
         else
             throw ex;
     }
-
 };
 
 // The function to use when invoking the plugin on a custom schema.
 exports.plugin = function (schema, options) {
 
-    // If we don't have reference to the counterSchema or the Counter model then the plugin was most likely not
+    // If we don't have reference to the counterSchema or the IdentityCounter model then the plugin was most likely not
     // initialized properly so throw an error.
-    if (!counterSchema || !Counter) throw new Error("mongoose-auto-increment has not been initialized");
+    if (!counterSchema || !IdentityCounter) throw new Error("mongoose-auto-increment has not been initialized");
 
     // Default settings and plugin scope variables.
     var settings = {
@@ -76,12 +65,12 @@ exports.plugin = function (schema, options) {
     schema.add(fields);
 
     // Find the counter for this model and the relevant field.
-    Counter.findOne(
+    IdentityCounter.findOne(
         { model: settings.model, field: settings.field },
         function (err, counter) {
             if (!counter) {
                 // If no counter exists then create one and save it.
-                counter = new Counter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy });
+                counter = new IdentityCounter({ model: settings.model, field: settings.field, count: settings.startAt - settings.incrementBy });
                 counter.save(function () {
                     ready = true;
                 });
@@ -93,7 +82,7 @@ exports.plugin = function (schema, options) {
 
     // Declare a function to get the next counter for the model/schema.
     var nextCount = function (callback) {
-        Counter.findOne({
+        IdentityCounter.findOne({
             model: settings.model,
             field: settings.field
         }, function (err, counter) {
@@ -107,7 +96,7 @@ exports.plugin = function (schema, options) {
 
     // Declare a function to reset counter at the start value - increment value.
     var resetCount = function (callback) {
-        Counter.findOneAndUpdate(
+        IdentityCounter.findOneAndUpdate(
             { model: settings.model, field: settings.field },
             { count: settings.startAt - settings.incrementBy },
             { new: true }, // new: true specifies that the callback should get the updated counter.
@@ -137,18 +126,18 @@ exports.plugin = function (schema, options) {
                 // first time.
                 if (ready) {
                     // Find the counter collection entry for this model and field and update it.
-                    Counter.findOneAndUpdate(
-                        // Counter documents are identified by the model and field that the plugin was invoked for.
+                    IdentityCounter.findOneAndUpdate(
+                        // IdentityCounter documents are identified by the model and field that the plugin was invoked for.
                         { model: settings.model, field: settings.field },
                         // Increment the count by `incrementBy`.
                         { $inc: { count: settings.incrementBy } },
                         // new:true specifies that the callback should get the counter AFTER it is updated (incremented).
                         { new: true },
                         // Receive the updated counter.
-                        function (err, updatedCounter) {
+                        function (err, updatedIdentityCounter) {
                             if (err) return next(err);
                             // If there are no errors then go ahead and set the document's field to the current count.
-                            doc[settings.field] = updatedCounter.count;
+                            doc[settings.field] = updatedIdentityCounter.count;
                             // Continue with default document save functionality.
                             next();
                         }

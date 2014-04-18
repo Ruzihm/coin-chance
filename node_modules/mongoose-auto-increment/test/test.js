@@ -22,7 +22,7 @@ after(function (done) {
 afterEach(function (done) {
     conn.model('User').collection.drop(function () {
         delete conn.models.User;
-        return conn.model('Mongoose-Auto-Increment').collection.drop(done);
+        return conn.model('IdentityCounter').collection.drop(done);
     });
 });
 
