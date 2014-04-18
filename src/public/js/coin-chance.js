@@ -179,11 +179,14 @@ socket.on('divestingOccurred', function(data) {
 
 var UpdateAnyBet = function (data) {
     invested.text(data.newInvested);
+    $("#investTabInvested").text(data.newInvested);
+
     investedProfit.text(data.newInvestedProfit);
+    $("#investTabInvestedProfit").text(data.newInvestedProfit);
 
     houseBankRoll.text(data.newBankRoll);
 
-    $("investedPortion").text((parseFloat(data.newInvested)*100/parseFloat(data.newBankRoll)).toFixed(6)+"%")
+    $("#investedPortion").text((parseFloat(data.newInvested)*100/parseFloat(data.newBankRoll)).toFixed(6)+"%")
     $("#balance").text(data.newBalance);
     houseInvestedProfit.text(data.newHouseInvestedProfit);
     houseLuck.text(data.newHouseLuck + "%");
