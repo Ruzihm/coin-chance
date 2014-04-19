@@ -22,36 +22,36 @@ html(lang="en")
         title= title + " - " + description
         meta(name="viewport" content="width=device-width, initial-scale=1")
         link(href="css/coin-chance-login.css" rel="stylesheet")
-        link(href="css/smoothness/jquery-ui-1.10.4.custom.min.css" rel="stylesheet")
+        link(rel="stylesheet",href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css")
+        link(rel="stylesheet",href="/css/lavish-bootstrap.min.css")
         script(src="/js/jquery-1.10.2.min.js")
-        script(src="/js/jquery-ui-1.10.4.custom.min.js")
+        script(src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js")
         script(async='async' src='/js/coin-chance-login.js')
     body
-        #content
-            #header
-                .section.title-section
-                    #title-name 
-                        a#title(href="/") #{title}
-            #inner 
-                h1 Login:
-                if loginFailure
-                    .failure Login failed
-                form#loginForm(method="POST",action="/login")
-                    span username
-                    input#username(name="username")
-                    br
-                    span password
-                    input#password(type="password",name="password")
-                    br
-                    span OTP code (if needed)
-                    input#otp(name="otp")
-                    br
-                    input#submit(type="submit")
-                h2 Or:
-                    input#newAccount(type="button",value="New Account")
-                #agplStuff
-                    if srcLink==""
-                        - srcLink = "/dist/dist.tar.gz"
-                    a#agplLink(href="#{srcLink}")
-                        img#agplLogo(src="/images/agplv3-155x51.png")
+        nav.navbar.navbar-inverse.navbar-fixed-top(role="navigation")
+            .container
+                .navbar-header
+                    a.navbar-brand(href="#") #{title}
+        .container
+            h1 Login:
+            if loginFailure
+                .failure Login failed
+            form#loginForm(method="POST",action="/login")
+                .formgroup
+                    label(for="username") Username
+                    input#username.form-control(type="text",name="username")
+                .formgroup
+                    label(for="password") Password
+                    input#password.form-control(type="password",name="password")
+                .formgroup
+                    label(for="otp") OTP code (if needed)
+                    input#otp.form-control(type="text",name="otp")
+                button#submit.btn.btn-default(type="submit") Log in
+            h2 Or:
+                button#newAccount.btn.btn-default(type="button") New Account
+            #agplStuff
+                if srcLink==""
+                    - srcLink = "/dist/dist.tar.gz"
+                a#agplLink(href="#{srcLink}")
+                    img#agplLogo(src="/images/agplv3-155x51.png")
 
