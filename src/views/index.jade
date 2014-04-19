@@ -42,7 +42,7 @@ html(lang="en")
                 #header.collapse.navbar-collapse
                     ul.nav.navbar-nav.navbar-right
                         li
-                            a(href="/#{loginLink}") #{fullName}
+                            a#name(href="/#{loginLink}") #{fullName}
                         li.dropdown
                             a.dropdown-toggle(data-toggle="dropdown" href="#")
                                 span Login
@@ -239,14 +239,6 @@ html(lang="en")
 
 
 
-            if isNewUser
-                #newUserDialog(style="display:none;")
-                    h1 Welcome to #{title}
-                    h3 You will be known as #{myName} unless you specify otherwise:
-                    form#newNameForm
-                        input#newName(type="text",maxlength="32",pattern="\\w{1,32}")
-                        input#newNameSubmit(type="submit",value="Use this name")
-
             if srcLink==""
                 - srcLink = "/dist/dist.tar.gz"
             #agplStuff
@@ -262,6 +254,19 @@ html(lang="en")
             input#minBet(value="#{minBet}",type="hidden")
             input#decimalPlaces(value="#{decimalPlaces}",type="hidden")
             input#investmentDecimalPlaces(value="#{investmentDecimalPlaces}",type="hidden")
+
+        if isNewUser
+            #newUserModal.modal.fade
+                .modal-dialog(style="left:0;right:0;")
+                    .modal-content
+                        .modal-header
+                            button.close(type="button") &times;
+                            h4.modal-title Welcome to #{title}
+                        .modal-body
+                            p You will be known as #{myName} unless you specify otherwise:
+                            form#newNameForm
+                                input#newName.form-control(type="text",maxlength="32",pattern="\\w{1,32}")
+                                button#newNameSubmit.btn.btn-default(type="submit") Use this name
 
         #depositWithdrawDialog.modal.fase(tabindex="-1",role="dialog")
             .modal-dialog(style="left:0;right:0;")

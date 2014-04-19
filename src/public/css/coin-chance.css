@@ -76,22 +76,6 @@ body {
     margin-right: 20px;
     }
 
-#name:link, #title:link {text-decoration:none; color: black;}
-#name:visited, #title:visited {text-decoration:none; color: black;}
-#name:hover, #title:hover {text-decoration:underline; color: black;}
-#name:active, #title:active {text-decoration:underline; color: black;}
-
-#name {
-    line-height:18px;
-    padding-top: 0px;
-    white-space: nowrap;
-    overflow:hidden;
-    height: 18px;
-    text-overflow: ellipsis;
-    font-size: small;
-    color: black;
-}
-
 #balance {
     font-size: x-large;
     font-weight: bold;

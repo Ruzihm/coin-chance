@@ -23,14 +23,14 @@ var messages = [];
 /*global io*/
 var socket = io.connect();
 if ($("#isNewUser").val() === 'true') {
-    var newUserDialog = $("#newUserDialog").dialog({autoOpen:true, width: 300});
+    var newUserModal = $("#newUserModal").modal();
     $("#newNameForm").submit(function (e){
         e.preventDefault();
         var name = $("#newName").val().trim();
         if (/^\w{3,32}$/.test(name)) {
             $("setDisplayName").removeClass('invalid');
             socket.emit('changeName', {newName:name});
-            $("#newUserDialog").dialog("close");
+            $("#newUserModal").modal("hide");
         } else {
             $("setDisplayName").addClass('invalid');
         }
@@ -157,6 +157,8 @@ socket.on('message', function (data) {
 socket.on('changeNameComplete', function (data) {
     var name = data.newName;
     $("#name").text(name);
+    var partName = name.substitute(/^\(\d+\) /,"");
+    $("#setDisplayName").value(partName);
 });
 
 socket.on('investingOccurred', function(data) {
