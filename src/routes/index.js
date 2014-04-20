@@ -105,7 +105,7 @@ exports.index = function(req, res){
         userData.getUserByAccountSecret(accountSecret, function (err,user) {
             if (err || !user) {
                 console.log("failed to find a user with account secret");
-            } else if (!user.loginName) {
+            } else {
                 console.log("Logged in via account Secret");
                 req.session.user = user.accountSecret;
                 res.cookie('userHash',user.hash, {

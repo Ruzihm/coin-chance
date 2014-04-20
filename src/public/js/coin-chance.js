@@ -499,6 +499,12 @@ socket.on("withdrawComplete",function(data) {
     $("#withdrawButton").removeAttr('disabled');
 });
 
+socket.on("betHistory", function(data) {
+    for (i in data.bets) {
+        showBet(data.bets[i]);
+    }
+});
+
 $("#withdrawButton").click(function(e) {
     e.preventDefault();
     var addr = $("#withdrawAddress").val();
@@ -690,10 +696,6 @@ function profitUpdated() {
 
     validateInputs();
 }
-
-//$("#randomizeDialog").dialog({autoOpen:false,width:300});
-//$("#historyDialog").dialog({autoOpen:false,width:300});
-//$("#depositWithdrawDialog").dialog({autoOpen:false,width:300,position:['middle',20]});
 
 betChance.on('keyup paste', chanceUpdated);
 betMult.on('keyup paste', multUpdated);

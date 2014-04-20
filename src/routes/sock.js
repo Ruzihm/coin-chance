@@ -22,6 +22,7 @@ var rollData = require('../model/roll'),
     House = require('../model/house'),
     Coin = require('../model/coin'),
     Chat = require('../model/chat'),
+    Roll = require('../model/roll'),
     events = require('events'),
     BigNumber = require('bignumber.js'),
     CryptoAddressCheck = require('cryptoaddress-validator');
@@ -58,6 +59,30 @@ exports.onconnect = function(socket) {
             socket.emit('message', { 
                 message: 'Welcome to Coin-Chance! Your name is '+ 
                 socket.currentUser.displayName +" ("+socket.currentUser.id+")" });
+            // Get up to last 20 bets for that user
+            Roll.RollModel.find({userId:user.id}).sort('-date').limit(20).exec(
+
+                function (err, rolls) {
+                    var rollsOut = [];
+                    for (i in rolls) {
+                        rollsOut.unshift({
+                            playerDisplayName: user.displayName,
+                            playerID: user.id,
+                            lucky: rolls[i].lucky,
+                            chance: rolls[i].chance,
+                            rollid: rolls[i].id,
+                            target: rolls[i].target,
+                            isHighGuess: rolls[i].isHighGuess,
+                            stake: rolls[i].stake,
+                            didWin: rolls[i].didWin,
+                            profit: rolls[i].profit,
+                            mult: rolls[i].multiplier
+                        });
+                    }
+                    socket.emit('betHistory', {
+                        bets: rollsOut
+                    }); 
+            });
         }
     });
 
