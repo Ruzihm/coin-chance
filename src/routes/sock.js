@@ -302,20 +302,20 @@ exports.onconnect = function(socket) {
         });
     });
 
-    var betCompleteListener = function (data) {
+    socket.betCompleteListener = function (data) {
         if (undefined === data) {
             return;
         }
         refreshUser(function () {
-            var isMe = (data.playerID === socket.currentUser.id);
-            //console.log("data.playerID currentUser.id", data.playerID, currentUser.id);
-            data.isMe = isMe;
-            if (isMe) {
-                data.newWageredProfit = socket.currentUser.wageredProfit;
-            }
-            data.newInvested = socket.currentUser.invested;
-            data.newInvestedProfit = socket.currentUser.investedProfit;
             socket.currentUser.getBalance( function(err,userBalance){
+                var isMe = (data.playerID === socket.currentUser.id);
+                //console.log("data.playerID currentUser.id isMe", data.playerID, socket.currentUser.id,isMe);
+                data.isMe = isMe;
+                if (isMe) {
+                    data.newWageredProfit = socket.currentUser.wageredProfit;
+                }
+                data.newInvested = socket.currentUser.invested;
+                data.newInvestedProfit = socket.currentUser.investedProfit;
                 data.newBalance = userBalance.toString(10);
 
                 //console.log("Sending out bet:",data);
@@ -324,10 +324,10 @@ exports.onconnect = function(socket) {
         });
     };
 
-    eventEmitter.on('betComplete',betCompleteListener);
+    eventEmitter.on('betComplete', socket.betCompleteListener);
 
     socket.on('disconnect', function(data) {
-        eventEmitter.removeListener('betComplete', betCompleteListener);
+        eventEmitter.removeListener('betComplete', socket.betCompleteListener);
     });
 
     function withdrawComplete() {
