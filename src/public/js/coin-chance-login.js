@@ -19,6 +19,6 @@
 
 $(function() {
 $("#newAccount").click(function (){
-    location = "/logout";
+    window.location = "/logout";
 });
 });

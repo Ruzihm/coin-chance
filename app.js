@@ -37,15 +37,17 @@ var config = require('./config'),
     logout = require('./src/routes/logout'),
     sock = require('./src/routes/sock');
 
-var server_options = {
-    key: fs.readFileSync(config.SSLKEY),
-    cert: fs.readFileSync(config.SSLCERT)
-};
+if (config.SSL_ENABLED) {
+    var server_options = {
+        key: fs.readFileSync(config.SSLKEY),
+        cert: fs.readFileSync(config.SSLCERT)
+    };
 
-var socketio_options = {
-    key: server_options.key,
-    cert: server_options.key
-};
+    var socketio_options = {
+        key: server_options.key,
+        cert: server_options.key
+    };
+}
 
 if (config.SRC_LINK === "") {
     // delete src/public/dist/dist.tar.gz
@@ -95,10 +97,22 @@ function startApp() {
     app.use(express.methodOverride());
     app.use(express.cookieParser(config.COOKIE_SECRET));
     var sessionStore;
+    var opts = {};
+    for (var key in config.SESSION_STORE_OPTIONS) {
+        opts[key] = config.SESSION_STORE_OPTIONS[key];
+    }
+
     if (config.SESSION_STORE_TYPE === 'MEMORY') {
         sessionStore = new express.session.MemoryStore();
+        console.log("MEMORY session store type configured");
+    } else if (config.SESSION_STORE_TYPE === 'REDIS') {
+        var RedisStore = require('connect-redis')(express);
+        var redis = require('redis').createClient();
+        opts.client = redis;
+        sessionStore = new RedisStore(opts);
+        console.log("REDIS session store type configured");
     }
-    app.use(express.session({store: sessionStore, cookie: {secure:true}}));
+    app.use(express.session({store: sessionStore, cookie: {secure:config.SSL_ENABLED}}));
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'src/public')));
 
@@ -114,11 +128,20 @@ function startApp() {
     app.get('/:accountSecret?', routes.index);
     app.get('/roll/:rollId', roll.roll);
 
-    var server = https.createServer(server_options, app).listen(config.HTTPSPORT,
-            function () {
-                console.log("Server listening on port " + config.HTTPSPORT);
-            });
-    sock.io = require('socket.io').listen(server, socketio_options);
+    var server;
+    if (config.SSL_ENABLED) {
+        server = https.createServer(server_options, app).listen(config.LISTENPORT,
+                function () {
+                    console.log("Server listening on port " + config.LISTENPORT);
+                });
+        sock.io = require('socket.io').listen(server, socketio_options);
+    } else {
+        server = http.createServer(app).listen(config.LISTENPORT,
+                function () {
+                    console.log("Server listening on port " + config.LISTENPORT);
+                });
+        sock.io = require('socket.io').listen(server);
+    }
     sock.io.set('log level', 1);
     sock.io.set('browser client minification', true);
     sock.io.set('browser client etag', true);

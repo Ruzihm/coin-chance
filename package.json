@@ -44,7 +44,9 @@
     "tar": "~0.1.19",
     "fstream": "~0.1.25",
     "tmp": "~0.0.23",
-    "async": "~0.7.0"
+    "async": "~0.7.0",
+    "connect-redis": "1.4.7",
+    "redis": "~0.10.1"
   },
   "devDependencies": {
     "grunt": "~0.4.4",

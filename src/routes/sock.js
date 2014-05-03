@@ -64,7 +64,7 @@ exports.onconnect = function(socket) {
 
                 function (err, rolls) {
                     var rollsOut = [];
-                    for (i in rolls) {
+                    for (var i in rolls) {
                         rollsOut.unshift({
                             playerDisplayName: user.displayName,
                             playerID: user.id,

@@ -27,6 +27,7 @@ html(lang="en")
         script(src="/js/head.min.js")
         script(type="text/javascript").
             head.load(["/socket.io/socket.io.v0.9.9.js","/js/jquery-1.10.2.min.js","//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js","/js/big.min.js"], function () {
+                document.Big = Big;
                 head.load(["/js/coin-chance.js","/js/jquery.qrcode.min.js"]);
             });
     body

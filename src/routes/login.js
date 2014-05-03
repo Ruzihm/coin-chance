@@ -26,13 +26,14 @@ exports.login = function(req, res){
         password = req.body.password,
         otp = req.body.otp;
 
-    console.log("username, password, otp", username, password,otp);
+    //console.log("username, password, otp", username, password,otp);
 
     userData.Login(username, password, otp, function (err, isSuccess, user) {
         if (err) {
             console.error(err);
         } else if (isSuccess) {
             req.session.user = user.accountSecret;
+            console.log("Login successful!");
         } else {
             req.session.loginFailure = true;
         }

@@ -39,7 +39,7 @@ function displayPage(req, res, user, isNew) {
     res.cookie('userHash',user.hash, {
         signed:true,
         maxAge: 31536000000,
-        secure: true,
+        secure: config.SSL_ENABLED,
         httpOnly: true
     });
 

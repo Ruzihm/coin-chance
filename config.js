@@ -31,7 +31,7 @@ exports.SRC_LINK = "https://github.com/Ruzihm/coin-chance";
 
 // Mongodb connection string
 
-exports.SESSION_STORE_TYPE = "MEMORY";
+exports.SESSION_STORE_TYPE = "REDIS";
 exports.SESSION_STORE_OPTIONS = {};
 
 exports.MONGO_CONN_STR = process.env.COIN_CHANCE_CONNSTR; // "mongodb://localhost/test"
@@ -45,11 +45,14 @@ exports.SITE_DESCRIPTION = "1% house edge - play and invest";
 exports.CURRENCY_SYMBOL = "Test BTC";
 
 // Base URL of site
-exports.BASE_URL = "https://Coin-chance.com";
+exports.BASE_URL = "http://Coin-chance.com";
 
 // Port of site
 exports.SOCKETIOPORT = 4000;
-exports.HTTPSPORT = 3000;
+exports.LISTENPORT = 3000;
+
+// Enable/disable SSL (Turning off is not good security!)
+exports.SSL_ENABLED = true;
 
 // SSL files
 exports.SSLKEY = process.env.COIN_CHANCE_SSLKEY; // '/path/to/ssl.key' 
