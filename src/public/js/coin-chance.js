@@ -164,6 +164,7 @@ socket.on('changeNameComplete', function (data) {
 
 socket.on('investingOccurred', function(data) {
     invested.text(parseFloat(data.currentInvested));
+    $("#investTabInvested").text(parseFloat(data.currentInvested));
     $("#balance").text(parseFloat(data.currentBalance));
     $("#invest").val("");
     houseBankRoll.text(data.newBankRoll);
@@ -173,6 +174,7 @@ socket.on('investingOccurred', function(data) {
 
 socket.on('divestingOccurred', function(data) {
     invested.text(parseFloat(data.currentInvested));
+    $("#investTabInvested").text(parseFloat(data.currentInvested));
     $("#balance").text(parseFloat(data.currentBalance));
     $("#divest").val("");
     houseBankRoll.text(data.newBankRoll);

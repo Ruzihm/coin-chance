@@ -19,7 +19,8 @@
 
 var rpc = require('json-rpc2'),
     config = require('../../config'),
-    BigNumber = require('bignumber.js');
+    BigNumber = require('bignumber.js'),
+    async = require('async');
 
 var client = new rpc.Client(
     config.COIN_RPC_PORT,
@@ -75,6 +76,30 @@ exports.getUserAddress = function (userId,cb) {
         function(err,res){
             cb(err,res);
     });
+};
+
+var subsumeQueue =  async.queue( function(task, endOfItemCb){
+    // Make sure user balance is STILL 0 after reaching this point!
+    exports.getUserBalance(task.userId, function (err, bal) {
+        if (err) {
+            endOfItemCb();
+            task.cb(err,0);
+        } else if (bal.equals(0)) {
+            // if balance is 0, nothing necessary 
+            // (THIS MEANS WE DODGED A RACE CONDITION BULLET! CONGRATS!)
+            endOfItemCb();
+            task.cb(null,0);
+        } else {
+            exports.moveFromUserToHouse(task.userId,bal,function (err){
+                endOfItemCb();
+                task.cb(null,bal);
+            });
+        }
+    });
+},1);
+
+exports.subsume = function(userId,cb) {
+    subsumeQueue.push({'userId':userId, 'cb':cb });
 };
 
 // amount is a BigNumber

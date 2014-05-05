@@ -228,18 +228,24 @@ userSchema.methods.getBalance = function(cb) {
             console.error(err);
             cb(err, BigNumber(usr.softNetBalance));
         } else {
-            console.log("Got balance: ",bal);
+            console.log("Got balance: ",bal.toString());
             if (bal.greaterThan(0)) {
-                usr.softNetBalance = bal.plus(usr.softNetBalance).toString(10);
-                usr.save();
-                Coin.moveFromUserToHouse(usr.hash,bal, function (err, res){
+                Coin.subsume(usr.hash, function (err, subsumed) {
                     if (err) {
                         console.error("Error subsuming coins!  " + err);
+                        cb(err, BigNumber(usr.softNetBalance));
+                    } else {
+                        usr.softNetBalance = subsumed.plus(usr.softNetBalance).toString(10);
+                        usr.save(function (err, savedUser) {
+                            if (err) {
+                                console.error("Error saving user after subsumption");
+                                cb(err, BigNumber(usr.softNetBalance));
+                            }
+                            cb(err, BigNumber(savedUser.softNetBalance));
+                        });
                     }
-                    cb(err, BigNumber(usr.softNetBalance));
                 });
-            }
-            else {
+            } else {
                 cb(err, BigNumber(usr.softNetBalance));
             }
         }
