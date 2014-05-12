@@ -122,19 +122,30 @@ userSchema.methods.getCoinAddress = function(cb) {
 
 // amount is a BigNumber
 userSchema.methods.withdraw = function(addr,amount,cb) {
-    var user = this;
-    Coin.withdraw(this.hash, addr, amount, function (err){
-        console.log("in withdraw cb in usermodel. amount=",amount);
-        if (err) {
-            console.error(err);
-            cb(err);
-            return;
-        }
-        
-        user.softNetBalance = BigNumber(user.softNetBalance).minus(
-            amount.plus(config.TOTAL_WITHDRAW_FEE)
-            ).toString(10);
-        user.save(cb);
+    var usr = this;
+    Coin.balanceQueue.push({
+        'func' : function (dummy, endCb){
+            Coin.withdraw(this.hash, addr, amount, function (err){
+                console.log("in withdraw cb in usermodel. amount=",amount);
+                if (err) {
+                    console.error(err);
+                    endCb(function() {
+                        cb(err);
+                    });
+                    return;
+                }
+                
+                usr.softNetBalance = BigNumber(usr.softNetBalance).minus(
+                    amount.plus(config.TOTAL_WITHDRAW_FEE)
+                    ).toString(10);
+                usr.save(function(err,usrResult){
+                    endCb(function() {
+                        cb(err,usrResult);
+                    });
+                });
+            });
+        },
+        'param' : null
     });
 };
 
@@ -144,42 +155,69 @@ userSchema.methods.getHistory = function (n, offset, cb) {
 
 // investAmount is a BigNumber
 userSchema.methods.invest = function(investAmount,cb) {
-
-    this.softNetBalance = investAmount.neg().plus(this.softNetBalance).toString(10);
-    this.invested = investAmount.plus(this.invested).toString(10);
-    this.save( function (err, resUser) {
-        if (err) {
-            cb(err);
-        }
-        House.House.bankRoll = investAmount.plus(House.House.bankRoll).toString(10);
-        House.House.save( function (err, resHouse) {
-            if (err) {
-                cb(err);
-            }
-            resUser.getBalance( function (err,bal) {
-                cb(err, bal, BigNumber(resUser.invested)); 
+    var usr = this;
+    Coin.balanceQueue.push({
+        'func' : function (dummy, endCb){
+            usr.softNetBalance = investAmount.neg().plus(usr.softNetBalance).toString(10);
+            usr.invested = investAmount.plus(usr.invested).toString(10);
+            usr.save( function (err, resUser) {
+                if (err) {
+                    endCb(function() {
+                        cb(err);
+                    });
+                    return;
+                }
+                House.House.bankRoll = investAmount.plus(House.House.bankRoll).toString(10);
+                House.House.save( function (err, resHouse) {
+                    if (err) {
+                        endCb(function() {
+                            cb(err);
+                        });
+                        return;
+                    }
+                    resUser.getBalance( function (err,bal) {
+                        endCb(function() {
+                            cb(err, bal, BigNumber(resUser.invested)); 
+                        });
+                    });
+                });
             });
-        });
+        },
+        'param' : null
     });
 };
 
 // divestAmount is a BigNumber
 userSchema.methods.divest = function(divestAmount, cb) {
-    this.softNetBalance = divestAmount.plus(this.softNetBalance).toString(10);
-    this.invested = divestAmount.neg().plus(this.invested).toString(10);
-    this.save( function (err, resUser) {
-        if (err) {
-            cb(err);
-        }
-        House.House.bankRoll = divestAmount.neg().plus(House.House.bankRoll).toString(10);
-        House.House.save( function (err, resHouse) {
-            if (err) {
-                cb(err);
-            }
-            resUser.getBalance( function (err,bal) {
-                cb(err,bal, BigNumber(resUser.invested));
+    var usr = this;
+    Coin.balanceQueue.push({
+        'func' : function (dummy, endCb){
+            usr.softNetBalance = divestAmount.plus(usr.softNetBalance).toString(10);
+            usr.invested = divestAmount.neg().plus(usr.invested).toString(10);
+            usr.save( function (err, resUser) {
+                if (err) {
+                    endCb(function() {
+                        cb(err);
+                    });
+                    return;
+                }
+                House.House.bankRoll = divestAmount.neg().plus(House.House.bankRoll).toString(10);
+                House.House.save( function (err, resHouse) {
+                    if (err) {
+                        endCb(function() {
+                            cb(err);
+                        });
+                        return;
+                    }
+                    resUser.getBalance( function (err,bal) {
+                        endCb(function() {
+                            cb(err,bal, BigNumber(resUser.invested));
+                        });
+                    });
+                });
             });
-        });
+        },
+        'param' : null
     });
 };
 
@@ -255,145 +293,158 @@ userSchema.methods.getBalance = function(cb) {
 // chance is a BigNumber from 0-100
 // betSize is a BigNumber
 userSchema.methods.bet = function(chance,isHighGuess, betSize, cb) {
-    this.clientSeedLocked = true;
-    this.betCount += 1;
+    var usr = this;
+    Coin.balanceQueue.push({
+        'func' : function (dummy, endCb){
+            usr.clientSeedLocked = true;
+            usr.betCount += 1;
 
-    // luckyNumber is a BigNumber from 0-100 
-    var luckyNumber = this.getLuckyNumber();
+            // luckyNumber is a BigNumber from 0-100 
+            var luckyNumber = usr.getLuckyNumber();
 
-    var target = chance;
-    if (isHighGuess) {
-        target = chance.neg().plus("99.9999");
-    }
-
-    var win = (
-            (isHighGuess && target.lessThan(luckyNumber)) ||
-            (!isHighGuess && target.greaterThan(luckyNumber))
-            );
-
-    var edge = config.HOUSE_EDGE;
-    var multiplier = BigNumber(100).minus(edge.times(100)).div(chance);
-    var rollInfo = {
-        'date': Date.now(),
-        'userId': this.id,
-        'multiplier': multiplier.toFixed(8),
-        'stake': betSize.toFixed(config.DECIMAL_PLACES),
-        'profit': win ? betSize.times(multiplier).minus(betSize).toFixed(config.DECIMAL_PLACES) : betSize.neg().toFixed(config.DECIMAL_PLACES), 
-        'chance': chance.toFixed(8),
-        'target': target.toFixed(4),
-        'isHighGuess': isHighGuess,
-        'lucky': luckyNumber.toFixed(4),
-        'didWin': win,
-        'serverSeedHash': crypto.createHash('sha256').update(this.serverSeed).digest('hex'),
-        'serverSeed': this.serverSeed,
-        'serverSeedRevealed': false,
-        'clientSeed': this.clientSeed,
-        'nonce': this.betCount
-    };
-    var roll = new RollModel.RollModel(rollInfo);
-    //console.log(roll);
-
-    this.wagered = betSize.plus(this.wagered).toFixed(config.DECIMAL_PLACES);
-
-    var minLuck = BigNumber(0.000001);
-    if (minLuck.greaterThan(this.luck)) {
-        this.luck = minLuck.toString(10);
-    }
-    if (minLuck.greaterThan(House.House.luck)) {
-        House.House.luck = minLuck.toString(10);
-    }
-    var expectedPrevWins = BigNumber(this.wins).div(this.luck).times(100);
-    var expectedHousePrevWins = BigNumber(House.House.wins).div(House.House.luck).times(100);
-
-    var delta;
-
-    if (win) {
-        this.wins = BigNumber(1).plus(this.wins).toString(10);
-        House.House.wins = BigNumber(1).plus(
-                House.House.wins).toString(10);
-        delta = BigNumber(rollInfo.profit).neg();
-    } else {
-        this.losses = BigNumber(1).plus(this.losses).toString(10);
-        House.House.losses = BigNumber(1).plus(
-                House.House.losses).toString(10);
-        delta = BigNumber(rollInfo.stake);
-    }
-    var user = this;
-
-    var cut = BigNumber(rollInfo.stake).times(config.HOUSE_CUT).round(config.INVESTMENT_DECIMAL_PLACES,BigNumber.ROUND_DOWN);
-
-    exports.ModifyInvestments(delta.minus(cut), cut, function (err) {
-        if (err) {
-            console.error(err);
-        }
-
-        var profit = BigNumber(rollInfo.profit);
-        user.wageredProfit = profit.plus(
-            user.wageredProfit).toString(10);
-        user.softNetBalance = profit.plus(
-            user.softNetBalance).toString(10);
-        House.House.wageredProfit = profit.plus(
-            House.House.wageredProfit).toString(10);
-
-        user.luck = BigNumber(100).times(user.wins).div(
-                expectedPrevWins.plus(chance.div(100))).toFixed(8);
-        House.House.luck = 100 * House.House.wins / ( expectedHousePrevWins + chance/100);
-        House.House.luck = BigNumber(100).times(
-            House.House.wins).div(
-                expectedHousePrevWins.plus(chance.div(100))).toFixed(8);
-
-        console.log("Saving roll...");
-    
-        var displayName = user.displayName;
-        var luck = user.luck;
-
-        user.save(function (err,savedUser){
-            if (err) {
-                console.error(err);
-                cb("There was a problem saving a user after a bet", null);
-                return;
+            var target = chance;
+            if (isHighGuess) {
+                target = chance.neg().plus("99.9999");
             }
-            House.House.save(function (err, savedHouse){
+
+            var win = (
+                    (isHighGuess && target.lessThan(luckyNumber)) ||
+                    (!isHighGuess && target.greaterThan(luckyNumber))
+                    );
+
+            var edge = config.HOUSE_EDGE;
+            var multiplier = BigNumber(100).minus(edge.times(100)).div(chance);
+            var rollInfo = {
+                'date': Date.now(),
+                'userId': usr.id,
+                'multiplier': multiplier.toFixed(8),
+                'stake': betSize.toFixed(config.DECIMAL_PLACES),
+                'profit': win ? betSize.times(multiplier).minus(betSize).toFixed(config.DECIMAL_PLACES) : betSize.neg().toFixed(config.DECIMAL_PLACES), 
+                'chance': chance.toFixed(8),
+                'target': target.toFixed(4),
+                'isHighGuess': isHighGuess,
+                'lucky': luckyNumber.toFixed(4),
+                'didWin': win,
+                'serverSeedHash': crypto.createHash('sha256').update(usr.serverSeed).digest('hex'),
+                'serverSeed': usr.serverSeed,
+                'serverSeedRevealed': false,
+                'clientSeed': usr.clientSeed,
+                'nonce': usr.betCount
+            };
+            var roll = new RollModel.RollModel(rollInfo);
+            //console.log(roll);
+
+            usr.wagered = betSize.plus(usr.wagered).toFixed(config.DECIMAL_PLACES);
+
+            var minLuck = BigNumber(0.000001);
+            if (minLuck.greaterThan(usr.luck)) {
+                usr.luck = minLuck.toString(10);
+            }
+            if (minLuck.greaterThan(House.House.luck)) {
+                House.House.luck = minLuck.toString(10);
+            }
+            var expectedPrevWins = BigNumber(usr.wins).div(usr.luck).times(100);
+            var expectedHousePrevWins = BigNumber(House.House.wins).div(House.House.luck).times(100);
+
+            var delta;
+
+            if (win) {
+                usr.wins = BigNumber(1).plus(usr.wins).toString(10);
+                House.House.wins = BigNumber(1).plus(
+                        House.House.wins).toString(10);
+                delta = BigNumber(rollInfo.profit).neg();
+            } else {
+                usr.losses = BigNumber(1).plus(usr.losses).toString(10);
+                House.House.losses = BigNumber(1).plus(
+                        House.House.losses).toString(10);
+                delta = BigNumber(rollInfo.stake);
+            }
+
+            var cut = BigNumber(rollInfo.stake).times(config.HOUSE_CUT).round(config.INVESTMENT_DECIMAL_PLACES,BigNumber.ROUND_DOWN);
+
+            exports.ModifyInvestments(delta.minus(cut), cut, function (err) {
                 if (err) {
                     console.error(err);
-                    cb("There was a problem saving the house after a bet", null);
-                    return;
                 }
-                roll.save(function (err,savedRoll){
+
+                var profit = BigNumber(rollInfo.profit);
+                usr.wageredProfit = profit.plus(
+                    usr.wageredProfit).toString(10);
+                usr.softNetBalance = profit.plus(
+                    usr.softNetBalance).toString(10);
+                House.House.wageredProfit = profit.plus(
+                    House.House.wageredProfit).toString(10);
+
+                usr.luck = BigNumber(100).times(usr.wins).div(
+                        expectedPrevWins.plus(chance.div(100))).toFixed(8);
+                House.House.luck = 100 * House.House.wins / ( expectedHousePrevWins + chance/100);
+                House.House.luck = BigNumber(100).times(
+                    House.House.wins).div(
+                        expectedHousePrevWins.plus(chance.div(100))).toFixed(8);
+
+                console.log("Saving roll...");
+            
+                var displayName = usr.displayName;
+                var luck = usr.luck;
+
+                usr.save(function (err,savedUser){
                     if (err) {
                         console.error(err);
-                        cb("There was a problem saving a bet",null);
+                        endCb(function() {
+                            cb("There was a problem saving a user after a bet", null);
+                        });
                         return;
                     }
-                    //console.log(savedRoll)
-                    var returndata = {
-                        'rollid': savedRoll._id,
-                        'playerDisplayName': displayName,
-                        'playerID': rollInfo.userId,
-                        'lucky': rollInfo.lucky,
-                        'target': rollInfo.target,
-                        'didWin': win,
-                        'profit': rollInfo.profit,
-                        'chance': rollInfo.chance,
-                        'mult': "x"+rollInfo.multiplier,
-                        'stake': rollInfo.stake,
-                        'date': rollInfo.date,
-                        "isHighGuess": isHighGuess,
-                        "newLuck": luck,
-                        "newHouseLuck": House.House.luck,
-                        "newHouseWinCount": House.House.wins,
-                        "newHouseLossCount": House.House.losses,
-                        "newHouseWageredProfit": House.House.wageredProfit,
-                        "newHouseInvestedProfit": House.House.investedProfit,
-                        "newBankRoll": House.House.bankRoll,
-                        "maxProfit": config.HOUSE_MAX_USER_PROFIT_PORTION_OF_BANKROLL.times(House.House.bankRoll).toFixed(config.DECIMAL_PLACES),
-                        "houseCommission": House.House.revenue
-                    };
-                    //console.log("returning: " + JSON.stringify(returndata));
-                    cb(null,returndata);
+                    House.House.save(function (err, savedHouse){
+                        if (err) {
+                            console.error(err);
+                            endCb(function() {
+                                cb("There was a problem saving the house after a bet", null);
+                            });
+                            return;
+                        }
+                        roll.save(function (err,savedRoll){
+                            if (err) {
+                                console.error(err);
+                                endCb(function() {
+                                    cb("There was a problem saving a bet",null);
+                                });
+                                return;
+                            }
+                            //console.log(savedRoll)
+                            var returndata = {
+                                'rollid': savedRoll._id,
+                                'playerDisplayName': displayName,
+                                'playerID': rollInfo.userId,
+                                'lucky': rollInfo.lucky,
+                                'target': rollInfo.target,
+                                'didWin': win,
+                                'profit': rollInfo.profit,
+                                'chance': rollInfo.chance,
+                                'mult': "x"+rollInfo.multiplier,
+                                'stake': rollInfo.stake,
+                                'date': rollInfo.date,
+                                "isHighGuess": isHighGuess,
+                                "newLuck": luck,
+                                "newHouseLuck": House.House.luck,
+                                "newHouseWinCount": House.House.wins,
+                                "newHouseLossCount": House.House.losses,
+                                "newHouseWageredProfit": House.House.wageredProfit,
+                                "newHouseInvestedProfit": House.House.investedProfit,
+                                "newBankRoll": House.House.bankRoll,
+                                "maxProfit": config.HOUSE_MAX_USER_PROFIT_PORTION_OF_BANKROLL.times(House.House.bankRoll).toFixed(config.DECIMAL_PLACES),
+                                "houseCommission": House.House.revenue
+                            };
+                            //console.log("returning: " + JSON.stringify(returndata));
+                            endCb(function() {
+                                cb(null,returndata);
+                            });
+                        });
+                    });
                 });
             });
-        });
+        },
+        'param':null
     });
 };
 

@@ -78,28 +78,48 @@ exports.getUserAddress = function (userId,cb) {
     });
 };
 
-var subsumeQueue =  async.queue( function(task, endOfItemCb){
-    // Make sure user balance is STILL 0 after reaching this point!
-    exports.getUserBalance(task.userId, function (err, bal) {
-        if (err) {
-            endOfItemCb();
-            task.cb(err,0);
-        } else if (bal.equals(0)) {
-            // if balance is 0, nothing necessary 
-            // (THIS MEANS WE DODGED A RACE CONDITION BULLET! CONGRATS!)
-            endOfItemCb();
-            task.cb(null,0);
-        } else {
-            exports.moveFromUserToHouse(task.userId,bal,function (err){
-                endOfItemCb();
-                task.cb(null,bal);
-            });
-        }
+// Oh god this is getting out of control
+// Basically, you push tasks in the form:
+//      {
+//          func: function(param, task_complete_callback(complete_acknowledged_callback())),
+//          param: [anything]
+//      }
+// The func will execute once it enters its place in the queue
+// The func MUST call the task_complete_callback, with a callback that will be called when the task is done.
+// Complicated, but I have too much coffee to slow down now!! Hahahahaha....
+exports.balanceQueue = async.queue( function(task, endOfItemCb) {
+    task.func(task.param, function(complete_acknowledged_callback){
+        endOfItemCb();
+        complete_acknowledged_callback();
     });
-},1);
+});
 
 exports.subsume = function(userId,cb) {
-    subsumeQueue.push({'userId':userId, 'cb':cb });
+    exports.balanceQueue.push({
+        'func' : function(dummy, endCb){
+            // Make sure user balance is STILL 0 after reaching this point!
+            exports.getUserBalance(task.userId, function (err, bal) {
+                if (err) {
+                    endCb(function(){
+                        cb(err,0)
+                    });
+                } else if (bal.equals(0)) {
+                    // if balance is 0, nothing necessary 
+                    // (THIS MEANS WE DODGED A RACE CONDITION BULLET! CONGRATS!)
+                    endCb(function() {
+                        cb(null,0);
+                    })
+                } else {
+                    exports.moveFromUserToHouse(task.userId,bal,function (err){
+                        endCb(function() {
+                            cb(null,bal);
+                        });
+                    });
+                }
+            });
+        },
+    'param': null
+    });
 };
 
 // amount is a BigNumber
