@@ -1,6 +1,6 @@
 {
   "name": "coin-chance",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "A play-and-invest internet casino that supports any bitcoind-like JSON-RPC api.",
   "keywords": [
