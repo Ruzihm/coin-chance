@@ -101,13 +101,13 @@ exports.subsume = function(userId,cb) {
             exports.getUserBalance(task.userId, function (err, bal) {
                 if (err) {
                     endCb(function(){
-                        cb(err,0)
+                        cb(err,BigNumber(0))
                     });
                 } else if (bal.equals(0)) {
                     // if balance is 0, nothing necessary 
                     // (THIS MEANS WE DODGED A RACE CONDITION BULLET! CONGRATS!)
                     endCb(function() {
-                        cb(null,0);
+                        cb(null,bal);
                     })
                 } else {
                     exports.moveFromUserToHouse(task.userId,bal,function (err){
