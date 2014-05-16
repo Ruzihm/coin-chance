@@ -98,7 +98,7 @@ exports.subsume = function(userId,cb) {
     exports.balanceQueue.push({
         'func' : function(dummy, endCb){
             // Make sure user balance is STILL 0 after reaching this point!
-            exports.getUserBalance(task.userId, function (err, bal) {
+            exports.getUserBalance(userId, function (err, bal) {
                 if (err) {
                     endCb(function(){
                         cb(err,BigNumber(0))
@@ -110,7 +110,7 @@ exports.subsume = function(userId,cb) {
                         cb(null,bal);
                     })
                 } else {
-                    exports.moveFromUserToHouse(task.userId,bal,function (err){
+                    exports.moveFromUserToHouse(userId,bal,function (err){
                         endCb(function() {
                             cb(null,bal);
                         });
