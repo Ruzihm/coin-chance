@@ -214,19 +214,21 @@ socket.on('betOccurred', function (data) {
 });
 
 var myBetOccurred = function (data) {
-    if (data.didWin) {
-        wins += 1;
-        $("#winCount").text(wins);
-    } else {
-        losses +=1;
-        $("#lossCount").text(losses);
-    }
-    var prevBalance = ($("#balance").text()-0);
-    var profit = data.profit - 0;
-    var prevProfit = ($("#wageredProfit").text()-0);
-    $("#wageredProfit").text(data.newWageredProfit);
-    $("#balance").text(data.newBalance);
-    $("#luck").text(data.newLuck + "%");
+    try {
+        if (data.didWin) {
+            wins += 1;
+            $("#winCount").text(wins);
+        } else {
+            losses +=1;
+            $("#lossCount").text(losses);
+        }
+        var prevBalance = Big($("#balance").text());
+        var profit = Big(data.profit);
+        var prevProfit = Big($("#wageredProfit").text());
+        $("#wageredProfit").text(data.newWageredProfit);
+        $("#balance").text(data.newBalance);
+        $("#luck").text(data.newLuck + "%");
+    } catch (err) {}
 };
 
 socket.on('randomizeOccurred', function (data) {
@@ -247,86 +249,89 @@ socket.on('randomizeOccurred', function (data) {
 });
 
 function bet(isHiBet) {
-    var wager = ($(betSize).val() - 0);
-    socket.emit('bet', {
-        betSize: wager ,
-        chance: betChance.val(),
-        isHighGuess: isHiBet});
+    try {
+        var wager = Big($(betSize).val());
+        socket.emit('bet', {
+            betSize: wager.toString(),
+            chance: betChance.val(),
+            isHighGuess: isHiBet});
+    } catch (err) {}
 }
 
 betHiButton.click(function(){bet(true);});
 betLoButton.click(function(){bet(false);});
 $("#decreaseChance").click(function(){
-    var newc = betChance.val();
-    if (isNaN(newc)) {
-        return;
-    }
-    newc = Big(newc).minus(1);
-    betChance.val(newc.toFixed(decimalPlaces).replace(/\.?0+$/,""));
-    chanceUpdated();
+    try {
+        var newc = Big(betChance.val());
+    
+        newc = newc.minus(1);
+        betChance.val(newc.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        chanceUpdated();
+    } catch (err) {}
 });
 $("#increaseChance").click(function(){
-    var newc = betChance.val();
-    if (isNaN(newc)) {
-        return;
-    }
-    newc = Big(newc).plus(1);
-    betChance.val(newc.toFixed(decimalPlaces).replace(/\.?0+$/,""));
-    chanceUpdated();
+    try {
+        var newc = Big(betChance.val());
+
+        newc = newc.plus(1);
+        betChance.val(newc.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        chanceUpdated();
+    } catch (err) {}
 });
+
 $("#halveMult").click(function(){
-    var newm = betMult.val();
-    if (isNaN(newm)) {
-        return;
-    }
-    newm = Big(newm).div(2);
-    betMult.val(newm.round(8,0).toFixed(8).replace(/\.?0+$/,""));
-    multUpdated();
+    try {
+        var newm = Big(betMult.val());
+        
+        newm = newm.div(2);
+        betMult.val(newm.round(8,0).toFixed(8).replace(/\.?0+$/,""));
+        multUpdated();
+    } catch (err) {}
 });
 $("#doubleMult").click(function(){
-    var newm = betMult.val();
-    if (isNaN(newm)) {
-        return;
-    }
-    newm = Big(newm).times(2);
-    betMult.val(newm.round(8,0).toFixed(8).replace(/\.?0+$/,""));
-    multUpdated();
+    try {
+        var newm = Big(betMult.val());
+    
+        newm = newm.times(2);
+        betMult.val(newm.round(8,0).toFixed(8).replace(/\.?0+$/,""));
+        multUpdated();
+    } catch (err) {}
 });
 $("#halveSize").click(function(){
-    var news = betSize.val();
-    if (isNaN(news)) {
-        return;
-    }
-    news = Big(news).div(2);
-    betSize.val(news.round(decimalPlaces,0).toFixed(decimalPlaces).replace(/\.?0+$/,""));
-    sizeUpdated();
+    try {
+        var news = Big(betSize.val());
+
+        news = news.div(2);
+        betSize.val(news.round(decimalPlaces,0).toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        sizeUpdated();
+    } catch (err) {}
 });
 $("#doubleSize").click(function(){
-    var news = betSize.val();
-    if (isNaN(news)) {
-        return;
-    }
-    news = Big(news).times(2);
-    betSize.val(news.round(decimalPlaces,0).toFixed(decimalPlaces).replace(/\.?0+$/,""));
-    sizeUpdated();
+    try {
+        var news = Big(betSize.val());
+
+        news = news.times(2);
+        betSize.val(news.round(decimalPlaces,0).toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        sizeUpdated();
+    } catch (err) {}
 });
 $("#decreaseProfit").click(function(){
-    var newp = betProfit.val();
-    if (isNaN(newp)) {
-        return;
-    }
-    newp = Big(newp).minus(1);
-    betProfit.val(newp.toFixed(decimalPlaces).replace(/\.?0+$/,""));
-    profitUpdated();
+    try {
+        var newp = Big(betProfit.val());
+
+        newp = newp.minus(1);
+        betProfit.val(newp.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        profitUpdated();
+    } catch (err) {}
 });
 $("#increaseProfit").click(function(){
-    var newp = betProfit.val();
-    if (isNaN(newp)) {
-        return;
-    }
-    newp = Big(newp).plus(1);
-    betProfit.val(newp.toFixed(decimalPlaces).replace(/\.?0+$/,""));
-    profitUpdated();
+    try {
+        var newp = Big(betProfit.val());
+
+        newp = newp.plus(1);
+        betProfit.val(newp.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        profitUpdated();
+    } catch (err) {}
 });
 
 $("#randomizeButton").click(function(e) {
@@ -334,27 +339,31 @@ $("#randomizeButton").click(function(e) {
 });
 
 $("#investButton").click(function(e) {
-    var investAmount = $("#invest").val() -0;
-    var balance = $("#balance").text() - 0;
-    if (investAmount > balance) {
-        return;
-    }
+    try {
+        var investAmount = Big($("#invest").val());
+        var balance = Big($("#balance").text());
+        if (investAmount.gt(balance)) {
+            return;
+        }
 
-    socket.emit('invest', {
-        'investAmount': investAmount
-    });
+        socket.emit('invest', {
+            'investAmount': investAmount.toString()
+        });
+    } catch (err) {}
 });
 
 $("#divestButton").click(function(e) {
-    var divestAmount = $("#divest").val() -0;
-    var investedAmount = $("#invested").text() -0;
-    if (divestAmount > investedAmount) {
-        return;
-    }
+    try {
+        var divestAmount = Big($("#divest").val());
+        var investedAmount = Big($("#invested").text());
+        if (divestAmount.gt(investedAmount)) {
+            return;
+        }
 
-    socket.emit('divest', {
-        'divestAmount': divestAmount
-    });
+        socket.emit('divest', {
+            'divestAmount': divestAmount.toString()
+        });
+    } catch (err) {}
 });
 
 $("#logoutButton").click(function(e) {
@@ -509,23 +518,25 @@ socket.on("betHistory", function(data) {
 });
 
 $("#withdrawButton").click(function(e) {
-    e.preventDefault();
-    var addr = $("#withdrawAddress").val();
-    var amount = parseFloat($("#withdrawAmount").val());
-    var balance = $("#balance").text();
-    var fee = $("#withdrawFee").val();
-    var valid = true;
+    try {
+        e.preventDefault();
+        var addr = $("#withdrawAddress").val();
+        var amount = Big($("#withdrawAmount").val());
+        var balance = Big($("#balance").text());
+        var fee = Big($("#withdrawFee").val());
+        var valid = true;
 
-    if (parseFloat(balance) < parseFloat(amount)+parseFloat(fee)) {
-        valid = false;
-        $("#withdrawAmount").addClass('invalid');
-    }
+        if (balance.lt(amount.plus(fee))) {
+            valid = false;
+            $("#withdrawAmount").addClass('invalid');
+        }
 
-    if (valid) {
-        $("#withdrawAmount").removeClass('invalid');
-        $("#withdrawButton").attr('disabled','disabled');
-        socket.emit('withdraw', {address:addr,amount:amount});
-    }
+        if (valid) {
+            $("#withdrawAmount").removeClass('invalid');
+            $("#withdrawButton").attr('disabled','disabled');
+            socket.emit('withdraw', {address:addr,"amount":amount.toString()});
+        }
+    } catch (err) {}
 
 });
 
@@ -539,64 +550,66 @@ function invalidBetReason(betReason){
 }
 
 function validateInputs() {
-    var balanceVal = parseFloat($("#balance").text());
-    var invalid = false;
-    //Validate chance. 
-    //>= 0.0001, <=99.99-100*houseEdge
-    var chance = parseFloat(betChance.val());
-    if (chance < 0.0001) {
-        betChance.addClass('invalid');
-        invalid = true;
-        invalidBetReason("Bet chance is too low");
-    } else if (chance > 99.99-100*houseEdge){
-        betChance.addClass('invalid');
-        invalid = true;
-        invalidBetReason("Bet chance is too high");
-    } else {
-        betChance.removeClass('invalid');
-    }
+    try {
+        var balanceVal = parseFloat($("#balance").text());
+        var invalid = false;
+        //Validate chance. 
+        //>= 0.0001, <=99.99-100*houseEdge
+        var chance = Big(betChance.val());
+        if (chance.lt(0.0001)) {
+            betChance.addClass('invalid');
+            invalid = true;
+            invalidBetReason("Bet chance is too low");
+        } else if (chance.gt(99.99-100*houseEdge)){
+            betChance.addClass('invalid');
+            invalid = true;
+            invalidBetReason("Bet chance is too high");
+        } else {
+            betChance.removeClass('invalid');
+        }
 
-    //Validate bet size.
-    //0 OR >=betMin, <=balance
-    var betSizeVal = parseFloat(betSize.val());
-    if (betSizeVal === 0) {
-        betSize.removeClass('invalid');
-    } else if (betSizeVal < $("#betMin").val()-0) {
-        betSize.addClass('invalid');
-        invalid = true;
-        invalidBetReason("Bet size is too small");
-    } else if (betSizeVal > balanceVal) {
-        betSize.addClass('invalid');
-        invalid = true;
-        invalidBetReason("Bet size can't exceed your balance");
-    } else {
-        betSize.removeClass('invalid');
-    }
+        //Validate bet size.
+        //0 OR >=betMin, <=balance
+        var betSizeVal = Big(betSize.val());
+        if (betSizeVal.eq(0)) {
+            betSize.removeClass('invalid');
+        } else if (betSizeVal.lt($("#minBet").val())) {
+            betSize.addClass('invalid');
+            invalid = true;
+            invalidBetReason("Bet size is too small");
+        } else if (betSizeVal.gt(balanceVal)) {
+            betSize.addClass('invalid');
+            invalid = true;
+            invalidBetReason("Bet size can't exceed your balance");
+        } else {
+            betSize.removeClass('invalid');
+        }
 
-    //Validate profit
-    // >= 1e-8, <= maxProfit
-    var maxProfitVal = parseFloat($("#maxProfit").text());
-    var betProfitVal = parseFloat(betProfit.val());
-    if (betProfitVal !== 0 && betProfitVal < 1e-8) {
-        betProfit.addClass('invalid');
-        invalid = true;
-        invalidBetReason("Your profit is too small (But zero is okay)");
-    } else if (betProfitVal > maxProfitVal) {
-        betProfit.addClass('invalid');
-        invalid = true;
-        invalidBetReason("Profit can't exceed max profit (" + maxProfitVal + ")");
-    } else {
-        betProfit.removeClass('invalid');
-    }
+        //Validate profit
+        // >= 1e-8, <= maxProfit
+        var maxProfitVal = Big($("#maxProfit").text());
+        var betProfitVal = Big(betProfit.val());
+        if ( (!betProfitVal.eq(0)) && betProfitVal.lt(1e-8)) {
+            betProfit.addClass('invalid');
+            invalid = true;
+            invalidBetReason("Your profit is too small (But zero is okay)");
+        } else if (betProfitVal.gt(maxProfitVal)) {
+            betProfit.addClass('invalid');
+            invalid = true;
+            invalidBetReason("Profit can't exceed max profit (" + maxProfitVal.toString() + ")");
+        } else {
+            betProfit.removeClass('invalid');
+        }
 
-    if (invalid) {
-        betHiButton.attr('disabled','disabled');
-        betLoButton.attr('disabled','disabled');
-    } else {
-        invalidBetReason();
-        betHiButton.removeAttr('disabled');
-        betLoButton.removeAttr('disabled');
-    }
+        if (invalid) {
+            betHiButton.attr('disabled','disabled');
+            betLoButton.attr('disabled','disabled');
+        } else {
+            invalidBetReason();
+            betHiButton.removeAttr('disabled');
+            betLoButton.removeAttr('disabled');
+        }
+    } catch (err) {}
     
 }
 
@@ -604,100 +617,96 @@ function validateInputs() {
 // In that case, change bet size only.
 
 function chanceUpdated() {
-    var chance = parseFloat(betChance.val());
-    if (isNaN(chance) || chance === prevChance) {
-        return;
-    }
+    try {
+        var chance = Big(betChance.val());
+        if (prevChance !== null && chance.eq(prevChance)) {
+            return;
+        }
 
-    //Keep chance small
-    prevChance=chance;
+        //Keep chance small
+        prevChance=chance;
 
-    $('#hiamount').text(Big(99.9999).minus(chance).toFixed(4));
-    $('#loamount').text(Big(chance).toFixed(4));
+        $('#hiamount').text(Big(99.9999).minus(chance).toFixed(4));
+        $('#loamount').text(Big(chance).toFixed(4));
     
-    //set Mult accordingly
-    var mult = Big(100).minus(houseEdge).div(chance).round(8,0);
-    $(betMult).val(mult.toFixed(8).replace(/\.?0+$/,""));
+        //set Mult accordingly
+        var mult = Big(1).minus(houseEdge).times(100).div(chance).round(8,0);
+        $(betMult).val(mult.toFixed(8).replace(/\.?0+$/,""));
+    
+        //set profit
+        var size = Big(betSize.val());
 
-    //set profit
-    var size = parseFloat(betSize.val());
-    if (isNaN(size)) {
-        return;
-    }
+        var profit = mult.times(size).minus(size).round(decimalPlaces,0);
+        betProfit.val(profit.toFixed(decimalPlaces).replace(/\.?0+$/,""));
 
-    var profit = mult.times(size).minus(size).round(decimalPlaces,0);
-    betProfit.val(profit.toFixed(decimalPlaces).replace(/\.?0+$/,""));
-
-    validateInputs();
+        validateInputs();
+    } catch (err) {}
 }
 
 function multUpdated() {
-    var mult = parseFloat($(betMult).val());
-    if (isNaN(mult) || mult === prevMult) {
-        return;
-    }
+    try {
+        var mult = Big($(betMult).val());
+        if (prevMult !== null && mult.eq(prevMult)) {
+            return;
+        }
 
-    // Keep mult small
-    //mult = Math.floor(mult*1e8)/1e8;
-    //$(betMult).val(mult);
+        // Keep mult small
+        //mult = Math.floor(mult*1e8)/1e8;
+        //$(betMult).val(mult);
 
-    prevMult = mult;
+        prevMult = mult;
 
-    // set Chance accordingly
-    var chance = Big(1).minus(houseEdge).div(mult).times(100).round(4,0);
-    betChance.val(chance.toFixed(4).replace(/\.?0+$/,""));
+        // set Chance accordingly
+        var chance = Big(1).minus(houseEdge).div(mult).times(100).round(4,0);
+        betChance.val(chance.toFixed(4).replace(/\.?0+$/,""));
 
-    $('#hiamount').text(Big(99.9999).minus(chance).toFixed(4));
-    $('#loamount').text(Big(chance).toFixed(4));
+        $('#hiamount').text(Big(99.9999).minus(chance).toFixed(4));
+        $('#loamount').text(Big(chance).toFixed(4));
 
-    //set profit
-    var size = parseFloat(betSize.val());
-    if (isNaN(size)) {
-        return;
-    }
+        //set profit
+        var size = Big(betSize.val());
 
-    var profit = Big(mult).times(size).minus(size).round(decimalPlaces,0);
-    betProfit.val(profit.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        var profit = Big(mult).times(size).minus(size).round(decimalPlaces,0);
+        betProfit.val(profit.toFixed(decimalPlaces).replace(/\.?0+$/,""));
 
-    validateInputs();
+        validateInputs();
+    } catch (err) {}
 }
 
 function sizeUpdated() {
-    var size = parseFloat(betSize.val());
-    if (isNaN(size) || size === prevSize) {
-        return;
-    }
+    try {
+        var size = Big(betSize.val());
+        if (prevSize !== null && size.eq(prevSize)) {
+            return;
+        }
 
-    prevSize = size;
+        prevSize = size;
 
-    var mult = parseFloat(betMult.val());
-    if (isNaN(mult)) {
-        return;
-    }
+        var mult = Big(betMult.val());
 
-    var profit = Big(mult).times(size).minus(size).round(decimalPlaces,0);
-    betProfit.val(profit.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        var profit = Big(mult).times(size).minus(size).round(decimalPlaces,0);
+        betProfit.val(profit.toFixed(decimalPlaces).replace(/\.?0+$/,""));
 
-    validateInputs();
+        validateInputs();
+    } catch (err) {}
 }
 
 function profitUpdated() {
-    var profit = parseFloat(betProfit.val());
-    if (isNaN(profit) || profit === prevProfit) {
-        return;
-    }
+    try {
+        var profit = Big(betProfit.val());
+        if (prevProfit !== null && profit.eq(prevProfit)) {
+            return;
+        }
 
-    prevProfit = profit;
+        prevProfit = profit;
 
-    var mult = parseFloat(betMult.val());
-    if (isNaN(mult)) {
-        return;
-    }
+        var mult = parseFloat(betMult.val());
 
-    var size = Big(profit).div(Big(mult).minus(1)).round(decimalPlaces,0);
-    betSize.val(size.toFixed(decimalPlaces).replace(/\.?0+$/,""));
+        var size = Big(profit).div(Big(mult).minus(1)).round(decimalPlaces,0);
+        betSize.val(size.toFixed(decimalPlaces).replace(/\.?0+$/,""));
 
-    validateInputs();
+        validateInputs();
+    } catch (err) {}
 }
 
 betChance.on('keyup paste', chanceUpdated);

@@ -247,7 +247,7 @@ exports.onconnect = function(socket) {
 
         var divestAmount = BigNumber(data.divestAmount).round(config.DECIMAL_PLACES, BigNumber.ROUND_DOWN);
 
-        if (divestAmount.equals(0)) {
+        if (divestAmount.lte(0)) {
             return;
         }
 
@@ -425,7 +425,7 @@ exports.onconnect = function(socket) {
 
         console.log("PEEPL BETTAN: ",data);
         // Sanity check on input
-        if (isNaN(data.betSize) ||  (data.betSize !== 0 && data.betSize < config.MINIMUM_BET )) {
+        if (isNaN(data.betSize) ||  (parseFloat(data.betSize) !== 0 && parseFloat(data.betSize) < config.MINIMUM_BET )) {
             console.log("Betsize improper:", data.betSize);
             return;
         }
