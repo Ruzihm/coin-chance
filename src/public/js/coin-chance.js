@@ -139,7 +139,12 @@ function showBet(s) {
             profitItem.text("+"+s.profit);
             profitItem.addClass("win-profit");
         } else {
-            profitItem.text("-"+s.profit);
+            // All losses should start with -, but dont make it redundant
+            if (parseFloat(s.profit) === 0) {
+                profitItem.text("-"+s.profit);
+            } else {
+                profitItem.text(s.profit);
+            }
             profitItem.addClass("lose-profit");
         }
 
