@@ -1,15 +1,14 @@
-
 /**
  * Module dependencies.
  */
 
-var http = require('http')
-  , utils = require('./utils')
-  , connect = require('connect')
-  , fresh = require('fresh')
-  , parseRange = require('range-parser')
-  , parse = connect.utils.parseUrl
-  , mime = connect.mime;
+var accepts = require('accepts');
+var typeis = require('type-is');
+var http = require('http');
+var fresh = require('fresh');
+var parseRange = require('range-parser');
+var parse = require('parseurl');
+var proxyaddr = require('proxy-addr');
 
 /**
  * Request prototype.
@@ -56,6 +55,8 @@ req.header = function(name){
 };
 
 /**
+ * To do: update docs.
+ *
  * Check if the given `type(s)` is acceptable, returning
  * the best match when true, otherwise `undefined`, in which
  * case you should respond with 406 "Not Acceptable".
@@ -99,9 +100,9 @@ req.header = function(name){
  * @api public
  */
 
-req.accepts = function(type){
-  var args = arguments.length > 1 ? [].slice.apply(arguments) : type;
-  return utils.accepts(args, this.get('Accept'));
+req.accepts = function(){
+  var accept = accepts(this);
+  return accept.types.apply(accept, arguments);
 };
 
 /**
@@ -112,11 +113,15 @@ req.accepts = function(type){
  * @api public
  */
 
-req.acceptsEncoding = function(encoding){
-  return !! ~this.acceptedEncodings.indexOf(encoding);
+req.acceptsEncoding = // backwards compatibility
+req.acceptsEncodings = function(){
+  var accept = accepts(this);
+  return accept.encodings.apply(accept, arguments);
 };
 
 /**
+ * To do: update docs.
+ *
  * Check if the given `charset` is acceptable,
  * otherwise you should respond with 406 "Not Acceptable".
  *
@@ -125,14 +130,15 @@ req.acceptsEncoding = function(encoding){
  * @api public
  */
 
-req.acceptsCharset = function(charset){
-  var accepted = this.acceptedCharsets;
-  return accepted.length
-    ? !! ~accepted.indexOf(charset)
-    : true;
+req.acceptsCharset = // backwards compatibility
+req.acceptsCharsets = function(){
+  var accept = accepts(this);
+  return accept.charsets.apply(accept, arguments);
 };
 
 /**
+ * To do: update docs.
+ *
  * Check if the given `lang` is acceptable,
  * otherwise you should respond with 406 "Not Acceptable".
  *
@@ -141,11 +147,10 @@ req.acceptsCharset = function(charset){
  * @api public
  */
 
-req.acceptsLanguage = function(lang){
-  var accepted = this.acceptedLanguages;
-  return accepted.length
-    ? !! ~accepted.indexOf(lang)
-    : true;
+req.acceptsLanguage = // backwards compatibility
+req.acceptsLanguages = function(){
+  var accept = accepts(this);
+  return accept.languages.apply(accept, arguments);
 };
 
 /**
@@ -175,98 +180,6 @@ req.range = function(size){
 };
 
 /**
- * Return an array of encodings.
- *
- * Examples:
- *
- *     ['gzip', 'deflate']
- *
- * @return {Array}
- * @api public
- */
-
-req.__defineGetter__('acceptedEncodings', function(){
-  var accept = this.get('Accept-Encoding');
-  return accept
-    ? accept.trim().split(/ *, */)
-    : [];
-});
-
-/**
- * Return an array of Accepted media types
- * ordered from highest quality to lowest.
- *
- * Examples:
- *
- *     [ { value: 'application/json',
- *         quality: 1,
- *         type: 'application',
- *         subtype: 'json' },
- *       { value: 'text/html',
- *         quality: 0.5,
- *         type: 'text',
- *         subtype: 'html' } ]
- *
- * @return {Array}
- * @api public
- */
-
-req.__defineGetter__('accepted', function(){
-  var accept = this.get('Accept');
-  return accept
-    ? utils.parseAccept(accept)
-    : [];
-});
-
-/**
- * Return an array of Accepted languages
- * ordered from highest quality to lowest.
- *
- * Examples:
- *
- *     Accept-Language: en;q=.5, en-us
- *     ['en-us', 'en']
- *
- * @return {Array}
- * @api public
- */
-
-req.__defineGetter__('acceptedLanguages', function(){
-  var accept = this.get('Accept-Language');
-  return accept
-    ? utils
-      .parseParams(accept)
-      .map(function(obj){
-        return obj.value;
-      })
-    : [];
-});
-
-/**
- * Return an array of Accepted charsets
- * ordered from highest quality to lowest.
- *
- * Examples:
- *
- *     Accept-Charset: iso-8859-5;q=.2, unicode-1-1;q=0.8
- *     ['unicode-1-1', 'iso-8859-5']
- *
- * @return {Array}
- * @api public
- */
-
-req.__defineGetter__('acceptedCharsets', function(){
-  var accept = this.get('Accept-Charset');
-  return accept
-    ? utils
-      .parseParams(accept)
-      .map(function(obj){
-        return obj.value;
-      })
-    : [];
-});
-
-/**
  * Return the value of param `name` when present or `defaultValue`.
  *
  *  - Checks route placeholders, ex: _/user/:id_
@@ -275,7 +188,7 @@ req.__defineGetter__('acceptedCharsets', function(){
  *
  * To utilize request bodies, `req.body`
  * should be an object. This can be done by using
- * the `connect.bodyParser()` middleware.
+ * the `bodyParser()` middleware.
  *
  * @param {String} name
  * @param {Mixed} [defaultValue]
@@ -319,37 +232,34 @@ req.param = function(name, defaultValue){
  * @api public
  */
 
-req.is = function(type){
-  var ct = this.get('Content-Type');
-  if (!ct) return false;
-  ct = ct.split(';')[0];
-  if (!~type.indexOf('/')) type = mime.lookup(type);
-  if (~type.indexOf('*')) {
-    type = type.split('/');
-    ct = ct.split('/');
-    if ('*' == type[0] && type[1] == ct[1]) return true;
-    if ('*' == type[1] && type[0] == ct[0]) return true;
-    return false;
-  }
-  return !! ~ct.indexOf(type);
+req.is = function(types){
+  if (!Array.isArray(types)) types = [].slice.call(arguments);
+  return typeis(this, types);
 };
 
 /**
  * Return the protocol string "http" or "https"
  * when requested with TLS. When the "trust proxy"
- * setting is enabled the "X-Forwarded-Proto" header
- * field will be trusted. If you're running behind
- * a reverse proxy that supplies https for you this
- * may be enabled.
+ * setting trusts the socket address, the
+ * "X-Forwarded-Proto" header field will be trusted.
+ * If you're running behind a reverse proxy that
+ * supplies https for you this may be enabled.
  *
  * @return {String}
  * @api public
  */
 
 req.__defineGetter__('protocol', function(){
-  var trustProxy = this.app.get('trust proxy');
-  if (this.connection.encrypted) return 'https';
-  if (!trustProxy) return 'http';
+  var trust = this.app.get('trust proxy fn');
+
+  if (!trust(this.connection.remoteAddress)) {
+    return this.connection.encrypted
+      ? 'https'
+      : 'http';
+  }
+
+  // Note: X-Forwarded-Proto is normally only ever a
+  //       single value, but this is to be safe.
   var proto = this.get('X-Forwarded-Proto') || 'http';
   return proto.split(/\s*,\s*/)[0];
 });
@@ -368,66 +278,36 @@ req.__defineGetter__('secure', function(){
 });
 
 /**
- * Return the remote address, or when
- * "trust proxy" is `true` return
- * the upstream addr.
+ * Return the remote address from the trusted proxy.
+ *
+ * The is the remote address on the socket unless
+ * "trust proxy" is set.
  *
  * @return {String}
  * @api public
  */
 
 req.__defineGetter__('ip', function(){
-  return this.ips[0] || this.connection.remoteAddress;
+  var trust = this.app.get('trust proxy fn');
+  return proxyaddr(this, trust);
 });
 
 /**
- * When "trust proxy" is `true`, parse
- * the "X-Forwarded-For" ip address list.
+ * When "trust proxy" is set, trusted proxy addresses + client.
  *
  * For example if the value were "client, proxy1, proxy2"
  * you would receive the array `["client", "proxy1", "proxy2"]`
- * where "proxy2" is the furthest down-stream.
+ * where "proxy2" is the furthest down-stream and "proxy1" and
+ * "proxy2" were trusted.
  *
  * @return {Array}
  * @api public
  */
 
 req.__defineGetter__('ips', function(){
-  var trustProxy = this.app.get('trust proxy');
-  var val = this.get('X-Forwarded-For');
-  return trustProxy && val
-    ? val.split(/ *, */)
-    : [];
-});
-
-/**
- * Return basic auth credentials.
- *
- * Examples:
- *
- *    // http://tobi:hello@example.com
- *    req.auth
- *    // => { username: 'tobi', password: 'hello' }
- *
- * @return {Object} or undefined
- * @api public
- */
-
-req.__defineGetter__('auth', function(){
-  // missing
-  var auth = this.get('Authorization');
-  if (!auth) return;
-
-  // malformed
-  var parts = auth.split(' ');
-  if ('basic' != parts[0].toLowerCase()) return;
-  if (!parts[1]) return;
-  auth = parts[1];
-
-  // credentials
-  auth = new Buffer(auth, 'base64').toString().match(/^([^:]*):(.*)$/);
-  if (!auth) return;
-  return { username: auth[1], password: auth[2] };
+  var trust = this.app.get('trust proxy fn');
+  var addrs = proxyaddr.all(this, trust);
+  return addrs.slice(1).reverse();
 });
 
 /**
@@ -467,16 +347,33 @@ req.__defineGetter__('path', function(){
 /**
  * Parse the "Host" header field hostname.
  *
+ * When the "trust proxy" setting trusts the socket
+ * address, the "X-Forwarded-Host" header field will
+ * be trusted.
+ *
  * @return {String}
  * @api public
  */
 
 req.__defineGetter__('host', function(){
-  var trustProxy = this.app.get('trust proxy');
-  var host = trustProxy && this.get('X-Forwarded-Host');
-  host = host || this.get('Host');
+  var trust = this.app.get('trust proxy fn');
+  var host = this.get('X-Forwarded-Host');
+
+  if (!host || !trust(this.connection.remoteAddress)) {
+    host = this.get('Host');
+  }
+
   if (!host) return;
-  return host.split(':')[0];
+
+  // IPv6 literal support
+  var offset = host[0] === '['
+    ? host.indexOf(']') + 1
+    : 0;
+  var index = host.indexOf(':', offset);
+
+  return ~index
+    ? host.substring(0, index)
+    : host;
 });
 
 /**

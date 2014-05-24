@@ -25,7 +25,7 @@ var db = require('./db'),
 
 var rollSchema = mongoose.Schema({
         date: Date,
-        userId: Number,
+        userId: {type: Number, ref:"User"},
         multiplier: String,
         stake: String,
         profit: String,

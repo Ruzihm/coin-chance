@@ -31,6 +31,13 @@ var config = require('./config'),
     http = require('http'),
     path = require('path'),
     tmp = require('tmp'),
+    compress = require('compression'),
+    morgan = require('morgan'),
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    session = require('express-session'),
+    serveStatic = require('serve-static'),
+    methodOverride = require('method-override'),
     routes = require('./src/routes'),
     roll = require('./src/routes/roll'),
     login = require('./src/routes/login'),
@@ -86,16 +93,14 @@ function startApp() {
     app.set('port', process.env.PORT || config.PORT);
     app.set('views', path.join(__dirname, 'src/views'));
     app.set('view engine', 'jade');
-    app.use(express.compress());
+    app.use(compress());
     app.use(minify({js_match:/js/}));
 
     // all environments
-    app.use(express.logger('dev'));
-    app.use(express.json());
-    app.use(express.urlencoded());
-    app.use(express.favicon());
-    app.use(express.methodOverride());
-    app.use(express.cookieParser(config.COOKIE_SECRET));
+    app.use(morgan('dev'));
+    app.use(bodyParser());
+    app.use(methodOverride());
+    app.use(cookieParser(config.COOKIE_SECRET));
     var sessionStore;
     var opts = {};
     for (var key in config.SESSION_STORE_OPTIONS) {
@@ -103,18 +108,23 @@ function startApp() {
     }
 
     if (config.SESSION_STORE_TYPE === 'MEMORY') {
-        sessionStore = new express.session.MemoryStore();
+        sessionStore = new session.MemoryStore();
         console.log("MEMORY session store type configured");
     } else if (config.SESSION_STORE_TYPE === 'REDIS') {
-        var RedisStore = require('connect-redis')(express);
+        var RedisStore = require('connect-redis')(session);
         var redis = require('redis').createClient();
         opts.client = redis;
         sessionStore = new RedisStore(opts);
         console.log("REDIS session store type configured");
     }
-    app.use(express.session({store: sessionStore, cookie: {secure:config.SSL_ENABLED}}));
-    app.use(app.router);
-    app.use(express.static(path.join(__dirname, 'src/public')));
+    app.use(session({store: sessionStore, cookie: {secure:config.SSL_ENABLED}}));
+
+    app.post('/login', login.login);
+    app.get('/logout', logout.logout);
+    app.get('/:accountSecret?', routes.index);
+    app.get('/roll/:rollId', roll.roll);
+
+    app.use(serveStatic(path.join(__dirname, 'src/public')));
 
     // development only
     if ('development' === app.get('env')) {
@@ -122,11 +132,6 @@ function startApp() {
         edt(app, {});
       app.use(express.errorHandler());
     }
-
-    app.post('/login', login.login);
-    app.get('/logout', logout.logout);
-    app.get('/:accountSecret?', routes.index);
-    app.get('/roll/:rollId', roll.roll);
 
     var server;
     if (config.SSL_ENABLED) {
