@@ -35,8 +35,8 @@ Installation instructions
 Usage instructions
 ============
 
-* Start the server in development mode: `$ su - coinchance -C "node /path/to/app.js"`
-* Start the server in production mode: `$ su - coinchance -C "NODE_ENV=production node /path/to/app.js"`
+* Start the server in development mode: `$ su - coinchance -c "node /path/to/app.js"`
+* Start the server in production mode: `$ su - coinchance -c "NODE_ENV=production node /path/to/app.js"`
 
 ### Donate!
 - Vertcoin `Vd4eFKqQwwgXNGAKFDnwPEe81XnH9nyGH`
