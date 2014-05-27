@@ -17,10 +17,10 @@ Installation instructions
 1. Unpack source to any empty directory.
 2. Modify config.js (Details coming soon)
 3. Setup service user: `$ useradd -m -s /bin/bash coinchance`
-4. Configure secret values in /home/coinchance/.bashrc : 
+4. Configure secret values in /home/coinchance/.bash_profile : 
 
     ```bash 
-    # /home/coinchance/.bashrc 
+    # /home/coinchance/.bash_profile 
     export COIN_CHANCE_CONNSTR=mongodb://localhost/test 
     export COIN_CHANCE_SSLKEY=/path/to/ssl.key  
     export COIN_CHANCE_SSLCERT=/path/to/ssl.crt 
