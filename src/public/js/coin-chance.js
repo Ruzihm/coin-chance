@@ -379,7 +379,7 @@ $("#sendCustomSeed").click(function(e) {
     socket.emit('sendCustomSeed', {
         clientSeed: $("#customCSeed").val()
     });
-    $("#randomizeDialog").dialog("close");
+    $("#randomizeDialog").modal("hide");
 });
 
 $("#chattab").on('shown.bs.tab', function (e) {
@@ -513,7 +513,10 @@ socket.on("gotHistory", function (data) {
 
 socket.on("withdrawComplete",function(data) {
     $("#balance").text(data.newBalance);
+    $("#depositWithdrawDialog").modal("hide");
     $("#withdrawButton").removeAttr('disabled');
+    $("#withdrawButton").removeClass('btn-disabled');
+
 });
 
 socket.on("betHistory", function(data) {
@@ -538,7 +541,8 @@ $("#withdrawButton").click(function(e) {
 
         if (valid) {
             $("#withdrawAmount").removeClass('invalid');
-            $("#withdrawButton").attr('disabled','disabled');
+            $("#withdrawButton").attr('disabled','true');
+            $("#withdrawButton").addClass('btn-disabled');
             socket.emit('withdraw', {address:addr,"amount":amount.toString()});
         }
     } catch (err) {}

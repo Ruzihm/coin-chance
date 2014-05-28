@@ -124,16 +124,18 @@ exports.subsume = function(userId,cb) {
 
 // amount is a BigNumber
 exports.withdraw = function (userId, addr, amount, cb) {
+    console.log("[src/model/coin.js] User userId:%s is withdrawing %s to %s.",userId,amount,addr);
     var realAmount = Number(amount.toFixed(config.DECIMAL_PLACES));
-    console.log("withdraw. realAmount: ", realAmount);
-    client.call("move", ["", userId, realAmount+config.COIN_NETWORK_FEE], function (err, res) {
+    var realAmountPlusFee = Number(amount.plus(config.COIN_NETWORK_FEE).toFixed(config.DECIMAL_PLACES));
+    console.info("[src/model/coin.js] Withdraw: realAmount:%d, realAmountPlusFee:%d.",realAmount,realAmountPlusFee);
+    client.call("move", ["", userId, realAmountPlusFee], function (err, res) {
         if (err) {
             console.error(err);
             cb(err);
             return;
         }
 
-        console.debug("Withdraw res: ",res);
+        console.info("Withdraw res: ",res);
 
         client.call("sendfrom", [
                 userId,

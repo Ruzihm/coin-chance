@@ -122,10 +122,11 @@ userSchema.methods.getCoinAddress = function(cb) {
 
 // amount is a BigNumber
 userSchema.methods.withdraw = function(addr,amount,cb) {
+    console.log("[src/model/user.js] User %s trying to withdraw %s to %s.",this.displayName,amount,addr);
     var usr = this;
     Coin.balanceQueue.push({
         'func' : function (dummy, endCb){
-            Coin.withdraw(this.hash, addr, amount, function (err){
+            Coin.withdraw(usr.hash, addr, amount, function (err){
                 console.log("in withdraw cb in usermodel. amount=",amount);
                 if (err) {
                     console.error(err);
