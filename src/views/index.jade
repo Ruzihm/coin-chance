@@ -67,6 +67,7 @@ html(lang="en")
                         strong#balance #{balance}
                     button#depositWithdrawButton.btn.btn-default(type="button") 
                         span.glyphicon.glyphicon-transfer
+                        span.hidden-xs Deposit/Withdraw
 
                 #chanceZone.form-group
                     label(for="betChance") Win odds
@@ -276,8 +277,10 @@ html(lang="en")
                         button.close(type="button",data-dismiss="modal",aria-hidden="true") &times;
                         h4.modal-title Deposit/Withdraw
                     .modal-body
-                        span Deposit Address
-                        #depositQR
+                        div Deposit Address
+                        span.hidden-xs.hidden-s (Click to see text)
+                        button#depositQR.btn
+
                         #depositAddress(style="display:none;") #{depositAddress}
 
                         form#withdrawForm(role="form")
