@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Ruzihm
+ *  Copyright 2014 Rick Van Tassel<rickvt@gmail.com>
  *
  *  This file is part of Coin-chance.
  *
@@ -18,6 +18,7 @@
  */
 
 var config = require('./config'),
+    assert = require('assert'),
     express = require('express'),
     https = require('https'),
     http = require('http'),
@@ -33,6 +34,7 @@ var config = require('./config'),
     tmp = require('tmp'),
     compress = require('compression'),
     morgan = require('morgan'),
+    errorhandler = require('errorhandler'),
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     session = require('express-session'),
@@ -43,6 +45,15 @@ var config = require('./config'),
     login = require('./src/routes/login'),
     logout = require('./src/routes/logout'),
     sock = require('./src/routes/sock');
+
+
+// config sanity check
+assert(config.TOTAL_WITHDRAW_FEE.gte(config.COIN_NETWORK_FEE), "config.TOTAL_WITHDRAW_FEE must be greater than or equal to config.COIN_NETWORK_FEE");
+if (config.HOUSE_MAX_USER_PROFIT_PORTION_OF_BANKROLL.gt(config.HOUSE_EDGE)) {
+    console.warn("WARNING!\nconfig.HOUSE_MAX_USER_PROFIT_PORTION_OF_BANKROLL (%s) is greater than config.HOUSE_EDGE (%s). For best results, it should be less than or equal.\nWARNING!",
+            config.HOUSE_MAX_USER_PROFIT_PORTION_OF_BANKROLL.toString(),
+            config.HOUSE_EDGE.toString());
+}
 
 if (config.SSL_ENABLED) {
     var server_options = {
@@ -66,7 +77,7 @@ if (config.SRC_LINK === "") {
     
     // compress everything in current dir and put it in a temp file
     var tmpFile = tmp.file(function (err, tmpPath, fd) {
-        console.info("Zipping up soure. Putting it in " + tmpPath);
+        console.info("Starting to zip up source. Gathering it in <%s> and zipping. Please wait...", tmpPath);
         fstream.Reader({ 'path': '.', 'type': 'Directory' })
             .pipe(tar.Pack())
             .pipe(zlib.Gzip())
@@ -74,10 +85,11 @@ if (config.SRC_LINK === "") {
             .pipe(fs.createWriteStream(tmpPath))
             .on('finish', function() {
                 // Move the zip to src/public/dist/dist.tar.gz
-                console.info("Source zipped. Moving to src/public/dist/dist.tar.gz");
+                var dest = "src/public/dist/dist.tar.gz";
+                console.info("Source zipped. Moving to <%s>", dest);
                 fstream.Reader({ 'path': tmpPath})
                     //.pipe(fstream.Writer({ 'path': 'src/public/dist/dist.tar.gz' }))
-                    .pipe(fs.createWriteStream('src/public/dist/dist.tar.gz'))
+                    .pipe(fs.createWriteStream(dest))
                     .on('finish', function () {
                         startApp();
                 });
@@ -97,7 +109,7 @@ function startApp() {
     app.use(minify({js_match:/js/}));
 
     // all environments
-    app.use(morgan('dev'));
+    app.use(morgan('default'));
     app.use(bodyParser());
     app.use(methodOverride());
     app.use(cookieParser(config.COOKIE_SECRET));
@@ -130,7 +142,7 @@ function startApp() {
     if ('development' === app.get('env')) {
         var edt = require('express-debug');
         edt(app, {});
-      app.use(express.errorHandler());
+      app.use(errorhandler());
     }
 
     var server;

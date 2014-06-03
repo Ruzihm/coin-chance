@@ -1,5 +1,5 @@
 /*
- *  Copyright 2014 Ruzihm
+ *  Copyright 2014 Rick Van Tassel<rickvt@gmail.com>
  *
  *  This file is part of Coin-chance.
  *
@@ -27,7 +27,7 @@ exports.DECIMAL_PLACES = 8;
 
 exports.INVESTMENT_DECIMAL_PLACES = 16;
 
-exports.SRC_LINK = "https://github.com/Ruzihm/coin-chance";
+exports.SRC_LINK = "";
 
 // Mongodb connection string
 
@@ -65,7 +65,7 @@ exports.COOKIE_SECRET = process.env.COIN_CHANCE_COOKIESECRET; //'my_cookie_secre
 exports.MINIFY_CACHE_DIR = false;
 
 
-// House cut (OF WAGES)
+// House cut (OF WAGERS)
 // This / house edge = house cut of expected profits
 exports.HOUSE_CUT = BigNumber(0.001);
 
