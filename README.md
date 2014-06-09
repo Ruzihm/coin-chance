@@ -39,7 +39,7 @@ All below variables must be present unless otherwise specified.
 Configuration file format will be changed with the 1.0.0 version (whenever that comes out).
 
 * `exports.DECIMAL_PLACES` -  *format:Number* How many decimal places the site's currency uses. Bitcoin has 8, for instance. **This must be the exact number of decimal places for that coin. Unexpected results may occur, especially if it is set too high.**
-* `exports.COIN_NETWORK_FEE` - *format:BigNumber* Put the fee your bitcoind-like is set up to charge per transaction here. **This must exactly match the transaction fee your bitcoind-like will charge for transactions!! Withdraws may fail or even worse, bookeeping may fail in unexpected ways!** 
+* `exports.COIN_NETWORK_FEE` - *format:BigNumber* Put the fee your bitcoind-like is set up to charge per transaction here. **This must always be equal to or greater than transactions fee your bitcoind-like will charge for transactions!! Coin-chance can not easily verify this on its own!!**
 * `exports.TOTAL_WITHDRAW_FEE` - *format:BigNumber* Put the total fee withdrawals have here. This must be greater than or equal to `COIN_NETWORK_FEE`.
 * `exports.INVESTMENT_DECIMAL_PLACES` - *format:Number* How precise investment calculations are. Longer is better, 16 is suggested.
 * `exports.SRC_LINK` - *format:String* A link for where to download (or purchase) the source of the site being run. If it is set as an empty string (i.e., ""), the server will serve its own source as a .tar.gz file.
@@ -64,7 +64,7 @@ Configuration file format will be changed with the 1.0.0 version (whenever that 
 * `exports.CHAT_MESSAGE_HISTORY_LENGTH` - *format:Number* How many chat messages that are displayed from history when a user loads the page.
 
 
-**The below options should be changed carefully. This file is covered by the AGPL and must be considered sharable**
+**The below options should be changed carefully. config.js is covered by AGPL and must be considered sharable**
 * `exports.MONGO_CONN_STR` - *format:String* Where to find the MongoDB connection string. 
 * `exports.SSLKEY` - *format:String* *optional only if* `SSL_ENABLED` *is false*. The location of the SSL key file.
 * `exports.SSLCERT` - *format:String* *optional only if* `SSL_ENABLED` *is false*. The location of the SSL cert file.
