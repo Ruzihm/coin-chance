@@ -90,6 +90,8 @@ exports.MIN_DEPOSIT_CONFIRMATIONS = 3;
 exports.COIN_NETWORK_FEE = BigNumber(0.00050000);
 exports.TOTAL_WITHDRAW_FEE = BigNumber(0.00100000);
 
+exports.MAX_WITHDRAW_AMOUNT = BigNumber("10");
+
 //Json-RPC strings for coin client
 
 exports.COIN_RPC_PORT = process.env.COIN_CHANCE_RPCPORT; //"18332";

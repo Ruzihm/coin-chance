@@ -379,6 +379,11 @@ exports.onconnect = function(socket) {
             withdrawComplete();
             return;
         }
+        
+        if (amount.plus(config.TOTAL_WITHDRAW_FEE).gt(config.MAX_WITHDRAW_AMOUNT)) {
+            withdrawComplete();
+            return;
+        }
 
         refreshUser(function () {
             var addr = data.address;

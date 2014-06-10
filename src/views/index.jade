@@ -256,6 +256,7 @@ html(lang="en")
             input#houseCut(value="#{houseCut}", type="hidden")
             input#ioconnectstring(value="#{ioconnectstring}", type="hidden")
             input#withdrawFee(value="#{withdrawFee}",type="hidden")
+            input#maxWithdrawAmount(value="#{maxWithdrawAmount}",type="hidden")
             input#isNewUser(value="#{isNewUser}",type="hidden")
             input#REQUIRED_CONFIRMATIONS(value="#{REQUIRED_CONFIRMATIONS}",type="hidden")
             input#minBet(value="#{minBet}",type="hidden")
@@ -293,10 +294,22 @@ html(lang="en")
                                 label.control-label(for="withdrawAddress") Withdraw address
                                 input#withdrawAddress.form-control(type="text")
                             .form-group
-                                label.control-label(for="withdrawAmount") Amount 
+                                label.control-label(for="withdrawAmount") Amount (before fee)
                                 input#withdrawAmount.form-control(type="text", pattern="[.0-9]+")
                             .form-group
+                                div
+                                    small Withraw fee:
+                                        strong #{currencySymbol}
+                                        &nbsp;
+                                        strong #{withdrawFee}
+                                div
+                                    small Max withdraw amount (including fee):
+                                        strong #{currencySymbol}
+                                        &nbsp;
+                                        strong #{maxWithdrawAmount}
                                 button#withdrawButton.btn.btn-default(type="submit") Withdraw
+
+
 
         #historyDialog.modal.fade(tabindex="-1",role="dialog")
             .modal-dialog(style="left:0;right:0;")

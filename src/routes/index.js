@@ -92,7 +92,8 @@ function displayPage(req, res, user, isNew) {
                 investmentDecimalPlaces: config.INVESTMENT_DECIMAL_PLACES,
                 investedPortion: BigNumber(user.invested).times(100).div(
                         bankRoll).toFixed(6)+"%",
-                currencySymbol: config.CURRENCY_SYMBOL
+                currencySymbol: config.CURRENCY_SYMBOL,
+                maxWithdrawAmount: config.MAX_WITHDRAW_AMOUNT
             });
         });
     });

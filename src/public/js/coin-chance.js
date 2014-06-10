@@ -532,11 +532,17 @@ $("#withdrawButton").click(function(e) {
         var amount = Big($("#withdrawAmount").val());
         var balance = Big($("#balance").text());
         var fee = Big($("#withdrawFee").val());
+        var max = Big($("#maxWithdrawAmount").val());
         var valid = true;
 
         if (balance.lt(amount.plus(fee))) {
             valid = false;
             $("#withdrawAmount").addClass('invalid');
+        }
+
+        if (amount.plus(fee).gt(max)) {
+            valid = false;
+            $("withdrawAmount").addClass('invalid');
         }
 
         if (valid) {
