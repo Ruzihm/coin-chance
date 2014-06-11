@@ -365,10 +365,12 @@ exports.onconnect = function(socket) {
         if (undefined === data) {
             return;
         }
+        console.log("[src/routes/sock.js] User %s submitted withdraw: %s.",socket.currentUser.displayName,JSON.stringify(data));
 
         //sanity check data
         if (isNaN(data.amount) ||  
             !CryptoAddressCheck(data.address)) { 
+            console.log("[src/routes/sock.js] Amount is not a number or address is invalid.");
             withdrawComplete();
             return;
         }
@@ -376,11 +378,13 @@ exports.onconnect = function(socket) {
         var amount = BigNumber(data.amount).round(config.DECIMAL_PLACES, BigNumber.ROUND_DOWN);
 
         if (amount.lte(0)) {
+            console.log("[src/routes/sock.js] Amount is not positive.");
             withdrawComplete();
             return;
         }
         
         if (amount.plus(config.TOTAL_WITHDRAW_FEE).gt(config.MAX_WITHDRAW_AMOUNT)) {
+            console.log("[src/routes/sock.js] Amount + total fee (%s) is greater than max withdraw amount (%s).",amount.plus(config.TOTAL_WITHDRAW_FEE).toString(),config.MAX_WITHDRAW_AMOUNT.toString());
             withdrawComplete();
             return;
         }
@@ -389,6 +393,7 @@ exports.onconnect = function(socket) {
             var addr = data.address;
             socket.currentUser.getBalance(function (err,userBalance) {
                 if (config.TOTAL_WITHDRAW_FEE.plus(amount).gt(userBalance)){
+                    console.log("[src/routes/sock.js] Amount + total fee (%s) is greater than user's balance (%s).",amount.plus(config.TOTAL_WITHDRAW_FEE).toString(),userBalance.toString());
                     withdrawComplete();
                     return;
                 }

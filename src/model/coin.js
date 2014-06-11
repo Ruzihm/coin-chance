@@ -101,14 +101,14 @@ exports.subsume = function(userId,cb) {
             exports.getUserBalance(userId, function (err, bal) {
                 if (err) {
                     endCb(function(){
-                        cb(err,BigNumber(0))
+                        cb(err,BigNumber(0));
                     });
                 } else if (bal.equals(0)) {
                     // if balance is 0, nothing necessary 
                     // (THIS MEANS WE DODGED A RACE CONDITION BULLET! CONGRATS!)
                     endCb(function() {
                         cb(null,bal);
-                    })
+                    });
                 } else {
                     exports.moveFromUserToHouse(userId,bal,function (err){
                         endCb(function() {
