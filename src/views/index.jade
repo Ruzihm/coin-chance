@@ -296,6 +296,7 @@ html(lang="en")
                             .form-group
                                 label.control-label(for="withdrawAmount") Amount (before fee)
                                 input#withdrawAmount.form-control(type="text", pattern="[.0-9]+")
+                                button#maxWithdrawButton.btn.btn-default.btn-sm(type="submit") Insert max withdrawal
                             .form-group
                                 div
                                     small Withraw fee:
@@ -303,11 +304,11 @@ html(lang="en")
                                         &nbsp;
                                         strong #{withdrawFee}
                                 div
-                                    small Max withdraw amount (including fee):
+                                    small Withdraw limit (including fee):
                                         strong #{currencySymbol}
                                         &nbsp;
                                         strong #{maxWithdrawAmount}
-                                button#withdrawButton.btn.btn-default(type="submit") Withdraw
+                                button#withdrawButton.btn.btn-primary(type="submit") Withdraw
 
 
 

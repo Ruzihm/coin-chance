@@ -525,6 +525,21 @@ socket.on("betHistory", function(data) {
     }
 });
 
+$("#maxWithdrawButton").click(function(e) {
+    try {
+        e.preventDefault();
+        var fee = Big($("#withdrawFee").val());
+        var balanceMinusFee = Big($("#balance").text()).minus(fee);
+        var maxMinusFee = Big($("#maxWithdrawAmount").val()).minus(fee);
+        var myMax = balanceMinusFee;
+        if (myMax.gt(maxMinusFee)) {
+            myMax = maxMinusFee;
+        }
+        $("#withdrawAmount").val(myMax.toString());
+    } catch (err) {}
+});
+
+
 $("#withdrawButton").click(function(e) {
     try {
         e.preventDefault();
