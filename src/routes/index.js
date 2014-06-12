@@ -93,7 +93,8 @@ function displayPage(req, res, user, isNew) {
                 investedPortion: BigNumber(user.invested).times(100).div(
                         bankRoll).toFixed(6)+"%",
                 currencySymbol: config.CURRENCY_SYMBOL,
-                maxWithdrawAmount: config.MAX_WITHDRAW_AMOUNT
+                maxWithdrawAmount: config.MAX_WITHDRAW_AMOUNT,
+                version: require('../../package.json').version
             });
         });
     });
