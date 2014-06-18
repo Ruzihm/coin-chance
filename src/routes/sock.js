@@ -366,11 +366,19 @@ exports.onconnect = function(socket) {
             return;
         }
         console.log("[src/routes/sock.js] User %s submitted withdraw: %s.",socket.currentUser.displayName,JSON.stringify(data));
+        
+        try {
 
-        //sanity check data
-        if (isNaN(data.amount) ||  
-            !CryptoAddressCheck(data.address)) { 
-            console.log("[src/routes/sock.js] Amount is not a number or address is invalid.");
+            //sanity check data
+            if (isNaN(data.amount) ||  
+                !CryptoAddressCheck(data.address)) { 
+                console.log("[src/routes/sock.js] Amount is not a number or address is invalid.");
+                withdrawComplete();
+                return;
+            }
+        } catch (e) {
+            console.error("[src/routes/sock.js] %s",e);
+            console.log("[src/routes/sock.js] There was an error checking the address");
             withdrawComplete();
             return;
         }
