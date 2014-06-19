@@ -43,6 +43,18 @@ exports.moveToUserFromHouse = function (userId, amount, cb) {
     client.call( "move", [userId,"",amount], cb);
 };
 
+exports.isValidAddress = function (address, cb) {
+    console.log("[src/model/coin.js] validateAddress");
+    client.call("validateaddress", [address], function (err,res) {
+        if (err) {
+            console.error("[src/model/coin.js] validateAddress error: %s",err);
+            cb(false);
+        } else {
+            cb(res.isvalid);
+        }
+    });
+};
+
 exports.getHistory = function(userId, n, offset, cb) {
     console.log("history");
     client.call( "listtransactions", [userId, n, offset], 

@@ -25,7 +25,6 @@ var rollData = require('../model/roll'),
     Roll = require('../model/roll'),
     events = require('events'),
     BigNumber = require('bignumber.js'),
-    CryptoAddressCheck = require('cryptoaddress-validator');
     config = require('../../config');
 
 BigNumber.config({ DECIMAL_PLACES:config.INVESTMENT_DECIMAL_PLACES*4, ROUNDING_MODE: BigNumber.ROUND_DOWN});
@@ -366,46 +365,44 @@ exports.onconnect = function(socket) {
             return;
         }
         console.log("[src/routes/sock.js] User %s submitted withdraw: %s.",socket.currentUser.displayName,JSON.stringify(data));
-        
-        try {
 
-            //sanity check data
-            if (isNaN(data.amount) ||  
-                !CryptoAddressCheck(data.address)) { 
-                console.log("[src/routes/sock.js] Amount is not a number or address is invalid.");
+        if (isNaN(data.amount)) {
+            console.log("[src/routes/sock.js] Amount is not a number or address");
+            withdrawComplete();
+            return;
+        }
+
+        Coin.isValidAddress(data.address,function (isValidAddress) {
+            if (!isValidAddress) {
+                console.log("[src/routes/sock.js] Address is invalid.");
                 withdrawComplete();
                 return;
             }
-        } catch (e) {
-            console.error("[src/routes/sock.js] %s",e);
-            console.log("[src/routes/sock.js] There was an error checking the address");
-            withdrawComplete();
-            return;
-        }
 
-        var amount = BigNumber(data.amount).round(config.DECIMAL_PLACES, BigNumber.ROUND_DOWN);
+            var amount = BigNumber(data.amount).round(config.DECIMAL_PLACES, BigNumber.ROUND_DOWN);
 
-        if (amount.lte(0)) {
-            console.log("[src/routes/sock.js] Amount is not positive.");
-            withdrawComplete();
-            return;
-        }
-        
-        if (amount.plus(config.TOTAL_WITHDRAW_FEE).gt(config.MAX_WITHDRAW_AMOUNT)) {
-            console.log("[src/routes/sock.js] Amount + total fee (%s) is greater than max withdraw amount (%s).",amount.plus(config.TOTAL_WITHDRAW_FEE).toString(),config.MAX_WITHDRAW_AMOUNT.toString());
-            withdrawComplete();
-            return;
-        }
+            if (amount.lte(0)) {
+                console.log("[src/routes/sock.js] Amount is not positive.");
+                withdrawComplete();
+                return;
+            }
+            
+            if (amount.plus(config.TOTAL_WITHDRAW_FEE).gt(config.MAX_WITHDRAW_AMOUNT)) {
+                console.log("[src/routes/sock.js] Amount + total fee (%s) is greater than max withdraw amount (%s).",amount.plus(config.TOTAL_WITHDRAW_FEE).toString(),config.MAX_WITHDRAW_AMOUNT.toString());
+                withdrawComplete();
+                return;
+            }
 
-        refreshUser(function () {
-            var addr = data.address;
-            socket.currentUser.getBalance(function (err,userBalance) {
-                if (config.TOTAL_WITHDRAW_FEE.plus(amount).gt(userBalance)){
-                    console.log("[src/routes/sock.js] Amount + total fee (%s) is greater than user's balance (%s).",amount.plus(config.TOTAL_WITHDRAW_FEE).toString(),userBalance.toString());
-                    withdrawComplete();
-                    return;
-                }
-                socket.currentUser.withdraw(addr,amount,withdrawComplete);
+            refreshUser(function () {
+                var addr = data.address;
+                socket.currentUser.getBalance(function (err,userBalance) {
+                    if (config.TOTAL_WITHDRAW_FEE.plus(amount).gt(userBalance)){
+                        console.log("[src/routes/sock.js] Amount + total fee (%s) is greater than user's balance (%s).",amount.plus(config.TOTAL_WITHDRAW_FEE).toString(),userBalance.toString());
+                        withdrawComplete();
+                        return;
+                    }
+                    socket.currentUser.withdraw(addr,amount,withdrawComplete);
+                });
             });
         });
     });

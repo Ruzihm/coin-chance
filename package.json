@@ -39,7 +39,6 @@
     "random-name": "~0.1.0",
     "speakeasy": "~1.0.3",
     "bignumber.js": "~1.3.0",
-    "cryptoaddress-validator": "~0.0.1",
     "tar": "~0.1.19",
     "fstream": "~0.1.25",
     "tmp": "~0.0.23",
