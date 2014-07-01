@@ -51,8 +51,9 @@ exports.onconnect = function(socket) {
 
     userData.getUserByAccountSecret(session.user, function (err,user) {
         if (err || !user) {
-            console.log("Failed to find a user with account secret:");
-            console.log(err);
+            console.error("[src/routes/sock.js] Failed to find a user with account secret: %s", err);
+            console.error("[src/routes/sock.js] session: %s", session);
+
         } else {
             socket.currentUser = user;
             socket.emit('message', { 
