@@ -102,7 +102,7 @@ if (config.SRC_LINK === "") {
 function startApp() {
     console.info("Starting app...");
     var app = express();
-    app.set('port', process.env.PORT || config.PORT);
+    app.set('port', process.env.LISTENPORT || config.LISTENPORT);
     app.set('views', path.join(__dirname, 'src/views'));
     app.set('view engine', 'jade');
     app.use(compress());
@@ -159,6 +159,7 @@ function startApp() {
                 });
         sock.io = require('socket.io').listen(server);
     }
+    
     sock.io.set('log level', 1);
     sock.io.set('browser client minification', true);
     sock.io.set('browser client etag', true);
